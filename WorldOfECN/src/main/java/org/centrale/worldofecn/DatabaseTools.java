@@ -145,13 +145,59 @@ public class DatabaseTools {
     }
 
     /**
+     * read database to world
+     * @param idJoueur
+     * @param nomPartie
+     * @param nomSauvegarde
+     * @param monde
+     */
+
+    public void readWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
+        if (this.connection != null) {
+            if (nomSauvegarde.equals(null)){
+                String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde;"
+                PreparedStatement stmt = connect.prepareStatement(query);
+                stmt.setString(1, idMonde);
+                stmt.setString(2, monde.nbTour);
+                stmt.setString(3, idMonde);
+                stmt.setString(4, idJoueur);
+                stmt.executeUpdate();
+            }
+            else {
+                String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ?, nom = ?  WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde;"
+                PreparedStatement stmt = connect.prepareStatement(query);
+                stmt.setString(1, idMonde);
+                stmt.setString(2, monde.nbTour);
+                stmt.setString(3, nomSauvegarde);
+                stmt.setString(4, nomSauvegarde);
+                stmt.setString(5, idMonde);
+                stmt.setString(6, idJoueur);
+                stmt.executeUpdate();
+            }
+        }
+        else {
+            return(null);
+        }
+    }
+
+    /**
      * get world from database
      * @param idJoueur
      * @param nomPartie
      * @param nomSauvegarde
      * @param monde
      */
-    public void readWorld(Integer idJoueur, String nomPartie, String nomSauvegarde, World monde) {
-
+    public void removeWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
+        if (this.connection != null) {
+            String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE 
+            idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)"
+            PreparedStatement stmt = connect.prepareStatement(query);
+            stmt.setString(1, idMonde);
+            stmt.setString(2, idJoueur);
+            stmt.executeUpdate();
+        }
+        else {
+            return(null);
+        }
     }
 }
