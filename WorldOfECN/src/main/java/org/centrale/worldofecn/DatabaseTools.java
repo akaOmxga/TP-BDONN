@@ -147,43 +147,48 @@ public class DatabaseTools {
     /**
      * read database to world
      * @param idJoueur
-     * @param nomPartie
+     * @param idMonde
      * @param nomSauvegarde
      * @param monde
      */
-
-    public void readWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
+    
+    public void readWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
             if (nomSauvegarde == null){
-                String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde;"
-                PreparedStatement stmt = connect.prepareStatement(query);
-                stmt.setString(1, idMonde);
-                stmt.setString(2, monde.nbTour);
-                stmt.setString(3, idMonde);
-                stmt.setString(4, idJoueur);
-                stmt.executeUpdate();
+                try {
+                    String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    PreparedStatement stmt = connection.prepareStatement(query);
+                    stmt.setString(1, String.valueOf(idMonde));
+                    stmt.setString(2, String.valueOf(monde.getNBTour()));
+                    stmt.setString(3, String.valueOf(idMonde));
+                    stmt.setString(4, String.valueOf(idJoueur));
+                    stmt.executeUpdate();
+                } catch (SQLException ex) {
+                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             else {
-                String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ?, nom = ?  WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde;"
-                PreparedStatement stmt = connect.prepareStatement(query);
-                stmt.setString(1, idMonde);
-                stmt.setString(2, monde.nbTour);
-                stmt.setString(3, nomSauvegarde);
-                stmt.setString(4, nomSauvegarde);
-                stmt.setString(5, idMonde);
-                stmt.setString(6, idJoueur);
-                stmt.executeUpdate();
+                try {
+                    String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ?, nom = ?  WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    PreparedStatement stmt = connection.prepareStatement(query);
+                    stmt.setString(5, String.valueOf(idMonde));
+                    stmt.setString(2, String.valueOf(monde.getNBTour()));
+                    stmt.setString(3, nomSauvegarde);
+                    stmt.setString(4, nomSauvegarde);
+                    stmt.setString(5, String.valueOf(idMonde));
+                    stmt.setString(6, String.valueOf(idJoueur));
+                    stmt.executeUpdate();
+                } catch (SQLException ex) {
+                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        }
-        else {
-            return(null);
         }
     }
 
     /**
      * get world from database
      * @param idJoueur
-     * @param nomPartie
+     * @param idMonde
      * @param nomSauvegarde
      * @param monde
      */
