@@ -110,8 +110,33 @@ public class DatabaseTools {
      * @param nomSauvegarde
      * @param monde
      */
-    public void saveWorld(Integer idJoueur, String nomPartie, String nomSauvegarde, World monde) {
 
+    public void saveWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
+        if (this.connection != null) {
+            if (nomSauvegarde.equals(null)){
+                String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde"
+                PreparedStatement stmt = connect.prepareStatement(query);
+                stmt.setString(1, monde.tableauMonde);
+                stmt.setString(2, monde.nbTour);
+                stmt.setString(3, idMonde);
+                stmt.setString(4, idJoueur);
+                stmt.executeUpdate();
+            }
+            else {
+                String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ?, nom = ? WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde"
+                PreparedStatement stmt = connect.prepareStatement(query);
+                stmt.setString(1, monde.tableauMonde);
+                stmt.setString(2, monde.nbTour);
+                stmt.setString(3, nomSauvegarde);
+                stmt.setString(4, nomSauvegarde);
+                stmt.setString(5, idMonde);
+                stmt.setString(6, idJoueur);
+                stmt.executeUpdate();
+            }
+        }
+        else {
+            return(null);
+        }
     }
 
     /**

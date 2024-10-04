@@ -28,6 +28,8 @@ public class World {
     private List<ElementDeJeu> listElements;
     private Joueur player;
 
+    private int nbTour;
+
     /**
      * Default constructor
      */
