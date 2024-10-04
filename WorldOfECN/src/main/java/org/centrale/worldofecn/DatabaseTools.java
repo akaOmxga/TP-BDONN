@@ -106,7 +106,7 @@ public class DatabaseTools {
     /**
      * save world to database
      * @param idJoueur
-     * @param nomPartie
+     * @param idMonde
      * @param nomSauvegarde
      * @param monde
      */
@@ -142,7 +142,7 @@ public class DatabaseTools {
     /**
      * read database to world
      * @param idJoueur
-     * @param nomPartie
+     * @param idMonde
      * @param nomSauvegarde
      * @param monde
      */
@@ -178,14 +178,14 @@ public class DatabaseTools {
     /**
      * get world from database
      * @param idJoueur
-     * @param nomPartie
+     * @param idMonde
      * @param nomSauvegarde
      * @param monde
      */
     public void removeWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE 
-            idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)"
+            String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE "
+                    + "idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)";
             PreparedStatement stmt = connect.prepareStatement(query);
             stmt.setString(1, idMonde);
             stmt.setString(2, idJoueur);
