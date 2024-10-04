@@ -88,7 +88,15 @@ public class DatabaseTools {
      * @return
      */
     public Integer getPlayerID(String nomJoueur, String password) {
-        return null;
+        if (this.connection!=null){
+            String query = "SELECT IDJoueur FROM Joueur Where Login=? AND Password=?";
+            PrepraredStatement stmt = connect.prepareStatement(query);
+            stmt.setString(1,nomJoueur);
+            stmt.setString(2,password);
+            return stmt.executeQuery();
+        } else if {
+            return null;
+        }
     }
 
     /**
