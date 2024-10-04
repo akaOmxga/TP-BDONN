@@ -56,7 +56,18 @@ public class World {
         this.listElements = new LinkedList();
         this.player = new Joueur("Player");
     }
-
+    /**
+     * 
+     * @return List
+     */
+    
+    public List<ElementDeJeu> getlistElements(){
+        return listElements;
+    }
+    
+    public int getNBTour(){
+        return nbTour;
+    }
     /**
      *
      * @return
