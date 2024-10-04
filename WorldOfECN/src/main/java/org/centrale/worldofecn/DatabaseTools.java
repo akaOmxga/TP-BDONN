@@ -154,7 +154,7 @@ public class DatabaseTools {
 
     public void readWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            if (nomSauvegarde.equals(null)){
+            if (nomSauvegarde == null){
                 String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde;"
                 PreparedStatement stmt = connect.prepareStatement(query);
                 stmt.setString(1, idMonde);
@@ -187,17 +187,22 @@ public class DatabaseTools {
      * @param nomSauvegarde
      * @param monde
      */
+    
     public void removeWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE 
-            idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)"
-            PreparedStatement stmt = connect.prepareStatement(query);
-            stmt.setString(1, idMonde);
-            stmt.setString(2, idJoueur);
-            stmt.executeUpdate();
-        }
-        else {
-            return(null);
+            if (nomSauvegarde == null){
+                try {
+                    String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE "
+                        + "idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, monde.getlistElements().toString());
+                stmt.setString(2, String.valueOf(monde.getNBTour()));
+                stmt.setString(3, String.valueOf(idMonde));
+                stmt.setString(4, String.valueOf(idJoueur));
+                } catch (SQLException ex) {
+                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
+                }     
+            }
         }
     }
 }
