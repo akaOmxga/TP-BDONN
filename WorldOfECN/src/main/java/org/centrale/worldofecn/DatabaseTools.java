@@ -7,13 +7,11 @@
  * -------------------------------------------------------------------------------- */
 package org.centrale.worldofecn;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 import org.centrale.worldofecn.world.World;
 
@@ -87,16 +85,22 @@ public class DatabaseTools {
      * @param password
      * @return
      */
+    
     public Integer getPlayerID(String nomJoueur, String password) {
         if (this.connection!=null){
-            String query = "SELECT IDJoueur FROM Joueur Where Login=? AND Password=?";
-            PrepraredStatement stmt = connect.prepareStatement(query);
-            stmt.setString(1,nomJoueur);
-            stmt.setString(2,password);
-            return stmt.executeQuery();
-        } else if {
-            return null;
+            try {
+                String query = "SELECT IDJoueur FROM Joueur Where Login=? AND Password=?";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1,nomJoueur);
+                stmt.setString(2,password);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                return rs.getInt("IDJoueur");
+            } catch (SQLException ex) {
+                Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+            return null;
     }
 
     /**
