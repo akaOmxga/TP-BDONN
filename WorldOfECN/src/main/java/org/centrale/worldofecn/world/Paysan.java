@@ -8,6 +8,7 @@
 package org.centrale.worldofecn.world;
 
 import java.sql.Connection;
+import java.util.List;
 
 /**
  *
@@ -21,6 +22,15 @@ public class Paysan extends Personnage {
      */
     public Paysan(World world) {
         super(world);
+    }
+    
+    public Paysan(String n,int pV,int dA,int ptPar,int paAtt,int paPar,int dMax,Point2D p,int argent,World jeu, List<Utilisable> effets){
+        super(n,pV,dA,ptPar,paAtt,paPar,dMax,p,argent,jeu, effets);
+    }
+    
+    @Override
+    public void combattre(Creature c){
+        System.out.println("Le paysan tremble devant l'adversité");
     }
     
     /**

@@ -11,6 +11,9 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.centrale.worldofecn.world.Creature;
+import org.centrale.worldofecn.world.ElementDeJeu;
+import org.centrale.worldofecn.world.Guerrier;
 
 
 import org.centrale.worldofecn.world.World;
@@ -115,12 +118,11 @@ public class DatabaseTools {
         if (this.connection != null) {
             if (nomSauvegarde == null){
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, monde.getlistElements().toString());
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, String.valueOf(idMonde));
-                    stmt.setString(4, String.valueOf(idJoueur));
+                    stmt.setString(1, String.valueOf(monde.getNBTour()));
+                    stmt.setString(2, String.valueOf(idMonde));
+                    stmt.setString(3, String.valueOf(idJoueur));
                     stmt.executeUpdate();
                 } catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -128,15 +130,35 @@ public class DatabaseTools {
             }
             else {
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ?, nom = ? WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    String query = "INSERT INTO Sauvegarde VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, monde.getlistElements().toString());
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, nomSauvegarde);
-                    stmt.setString(4, nomSauvegarde);
-                    stmt.setString(5, String.valueOf(idMonde));
-                    stmt.setString(6, String.valueOf(idJoueur));
-                    stmt.executeUpdate();
+                    stmt.setString(4, String.valueOf(idMonde));
+                    stmt.setString(1, String.valueOf(monde.getNBTour()));
+                    stmt.setString(2, nomSauvegarde);
+                    ResultSet id = stmt.executeQuery() ;
+                    
+                    for (ElementDeJeu e: monde.getlistElements()){
+                        if (e instanceof Creature c ){
+                            query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+                            stmt.setString(1,String.valueOf(id));
+                            stmt.setString(2, String.valueOf(c.getPtVie()));
+                            stmt.setString(3, String.valueOf(c.getpageAtt()));
+                            stmt.setString(4, String.valueOf(c.getPosition().getX()));
+                            stmt.setString(5, String.valueOf(c.getPosition().getY()));
+                            stmt.setString(6, String.valueOf(c.getdegAtt()));
+                            id = stmt.executeQuery();
+                            if (c instanceof Guerrier g){ 
+                                query = "INSERT INTO Creature(idCreature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+                                stmt.setString(1,String.valueOf(id));
+                                stmt.setString(2, String.valueOf(g.getPtPar));
+                                stmt.setString(3, String.valueOf(c.getpagePar()));
+                                stmt.setString(4, String.valueOf(c.getnom));
+                                id = stmt.executeQuery();
+                                
+                            }
+                        }
+                    }
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
                 }

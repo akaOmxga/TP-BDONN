@@ -39,7 +39,7 @@ public class World {
 
     /**
      * Constructor for specific world size
-     *
+     *ç
      * @param width : world width
      * @param height : world height
      */
@@ -127,7 +127,7 @@ public class World {
         Random rand = new Random();
         for (int i = 0; i < nbElements; i++) {
             int itemType = rand.nextInt(3);
-            Personnage item = null;
+            Creature item = null;
             while (item == null) {
                 switch (itemType) {
                     case 0: // Guerrier
