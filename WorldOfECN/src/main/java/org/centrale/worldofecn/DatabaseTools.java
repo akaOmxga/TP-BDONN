@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.centrale.worldofecn.world.Creature;
 
 
 import org.centrale.worldofecn.world.World;
@@ -154,16 +155,47 @@ public class DatabaseTools {
     
     public void readWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            if (nomSauvegarde == null){
+            if (nomSauvegarde == null){ // Pour une Sauvegarde Rapide
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(idMonde));
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, String.valueOf(idMonde));
-                    stmt.setString(4, String.valueOf(idJoueur));
-                    stmt.executeUpdate();
-                } catch (SQLException ex) {
+                    // Creation du Monde 
+                    String query1 = "INSERT INTO Monde(idJoueur, Largeur, Hauteur) values (?,?,?)";
+                    PreparedStatement stmt1 = connection.prepareStatement(query1);
+                    stmt1.setString(1, String.valueOf(idJoueur));
+                    stmt1.setString(2, String.valueOf(monde.getWidth()));
+                    stmt1.setString(3, String.valueOf(monde.getHeight()));
+                    stmt1.executeUpdate();
+                    // Charger le World monde : Creature 
+                    String query2 = "SELECT * FROM Creature INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Creature.idSauvegarde";
+                    PreparedStatement stmt2 = connection.prepareStatement(query2);
+                    stmt2.executeQuery();
+                    ResultSet rs2 = stmt2.executeQuery();
+                    // Creation des Creatures
+                    while (rs2.next()) {
+                        // Récupération des attributs de la créature depuis le ResultSet
+                        ArrayList statCreature = Creature.getStat(rs2);
+                       
+                        // Récupération de l'Humanoide associé 
+                        String query2_1 = "SELECT * FROM Humanoide INNER JOIN Creature ON Creature.idCreature = Humanoide.idCreature WHERE Humanoide.idCreature = ?";
+                        stmt1.setString(1, String.valueOf(idJoueur));
+                        PreparedStatement stmt2_1 = connection.prepareStatement(query2_1);
+                        stmt2_1.executeQuery();
+                        ResultSet rs2_1 = stmt2_1.executeQuery();
+
+                        
+                        
+
+                        // Récupérer les autres attributs si nécessaire
+
+                        // Création d'un objet Creature pour chaque ligne / int ptVie,int dAtt, int ptP,int pageA, int pageP,Point2D p,World jeu, List<Utilisable> effets
+                        // Creature creature = new Creature(id, nom, niveau);
+                        }
+                    // Charger le World monde : Objet 
+                    String query3 = "SELECT * FROM Objet INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Objet.idSauvegarde";
+                    PreparedStatement stmt3 = connection.prepareStatement(query3);
+                    stmt3.executeQuery();
+                    ResultSet rs3 = stmt3.executeQuery(); 
+                    }
+                catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
