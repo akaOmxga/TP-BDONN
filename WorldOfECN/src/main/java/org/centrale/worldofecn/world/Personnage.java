@@ -26,6 +26,8 @@ public abstract class Personnage extends Creature {
     private String nom ;
     private int distAttMax;
     private int argent;
+    private int ptPar;
+    private int pagePar;
 
     /**
      * Premier constructeur de Personnage
@@ -44,10 +46,12 @@ public abstract class Personnage extends Creature {
      */
     
     public Personnage(String nom,int ptVie,int dAtt, int ptP,int pageA, int pageP, int distAttM,Point2D p,int argent,World jeu, List<Utilisable> effets){
-        super(ptVie,dAtt,ptP,pageA,pageP,p,jeu, effets);
+        super(ptVie,dAtt,pageP,p,jeu, effets);
         this.nom = nom;
         distAttMax = distAttM;
         this.argent = argent;
+        this.ptPar = ptP;
+        this.pagePar = pageP;
     }
     
     /**
@@ -60,6 +64,8 @@ public abstract class Personnage extends Creature {
         this.nom = p.nom;
         this.distAttMax = p.distAttMax;
         this.argent = p.argent;
+        this.ptPar = p.ptPar;
+        this.pagePar = p.pagePar;
     }
 
     /**
@@ -72,6 +78,8 @@ public abstract class Personnage extends Creature {
         this.nom = "";
         distAttMax = 0;
         this.argent = 0;
+        this.ptPar = 0;
+        this.pagePar = 0;
     }
     
     /**
@@ -97,12 +105,43 @@ public abstract class Personnage extends Creature {
         return distAttMax;
     }
     
+    /**
+     * getptPar renvoie le nombre de dégat que la Creature pare a chaque parade réussie
+     * @return ptPar est le nombre de dégat que la Creature pare a chaque parade réussie
+     */
+    
+    public int getptPar(){
+        return ptPar;
+    }
+    
+    public int getpagePar(){
+        return pagePar;
+    }
+    
     public void setNom(String nom){
         this.nom = nom;
     }
     
     public void setArgent(int argen){
         argent = argen;
+    }
+    
+    /**
+     * setptPar permet d'attribuer la valeur ptP aux dégât parés ptPar de la Creature
+     * @param ptP est le nombre de dégat que la Creature pare a chaque parade réussie
+     */
+    
+    public void setptPar(int ptP){
+        ptPar = ptP;
+    }
+    
+    /**
+     * setpagePar permet d'attribuer la valeur pageP aux pourcentages de parade réussie pagePar de la Creature
+     * @param pageP est le pourcentage de chance qu'une parade de la Creature soit réussie
+     */
+    
+    public void setpagePar(int pageP){
+        pagePar = pageP;
     }
     
     public void setdistM(int distM){

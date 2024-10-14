@@ -86,6 +86,10 @@ public abstract class ElementDeJeu {
         return pos.getY();
     }
     
+    public Point2D getPosition(){
+        return pos;
+    }
+    
     /**
      * distance permet de calculer la distance entre deux Creatures
      * @param c est la Creature avec laquelle nous calculons la distance
@@ -100,8 +104,9 @@ public abstract class ElementDeJeu {
     /**
      *
      * @param connection
+     * @param id
      */
-    public abstract void saveToDatabase(Connection connection);
+    public abstract void saveToDatabase(Connection connection, Integer id);
     
     /**
      *

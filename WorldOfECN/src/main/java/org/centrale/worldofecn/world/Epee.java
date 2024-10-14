@@ -9,6 +9,11 @@
 package org.centrale.worldofecn.world;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -101,10 +106,31 @@ public class Epee extends Objet {
     /**
      *
      * @param connection
+     * @param idSauvegarde
      */
     @Override
-    public void saveToDatabase(Connection connection) {
-
+    public void saveToDatabase(Connection connection,Integer idSauvegarde) {
+        try {
+            String query = "INSERT INTO Objet VALUES ( ? , ? , ? , ? , ? ) RETURNING idCreature";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(idSauvegarde));
+            stmt.setString(2, String.valueOf(this.getPlace()));
+            stmt.setString(3, String.valueOf(this.getPrix()));
+            stmt.setString(4, String.valueOf(this.getPosition().getX()));
+            stmt.setString(5, String.valueOf(this.getPosition().getY()));
+            ResultSet id = stmt.executeQuery();
+            int id2 = id.getInt("idCreature");
+            query = "INSERT INTO Categorie(idObjet,degBonus,nbMain) VALUES ( ? , ? , ?)";
+            stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(id2));
+            stmt.setString(2, String.valueOf(this.degAtt));
+            stmt.setString(2, String.valueOf(this.nbMain));
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     /**
