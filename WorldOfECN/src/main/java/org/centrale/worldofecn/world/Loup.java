@@ -91,6 +91,7 @@ public class Loup extends Monstre implements Combattant{
      /**
      *
      * @param connection
+     * @param idSauvegarde
      */
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
@@ -98,20 +99,20 @@ public class Loup extends Monstre implements Combattant{
             String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
-            stmt.setString(1,String.valueOf(idSauvegarde));
-            stmt.setString(2, String.valueOf(this.getptVie()));
-            stmt.setString(3, String.valueOf(this.getpageAtt()));
-            stmt.setString(4, String.valueOf(this.getPosition().getX()));
-            stmt.setString(5, String.valueOf(this.getPosition().getY()));
-            stmt.setString(6, String.valueOf(this.getdegAtt()));
+            stmt.setInt(1,idSauvegarde);
+            stmt.setInt(2, this.getptVie());
+            stmt.setInt(3, this.getpageAtt());
+            stmt.setInt(4, this.getPosition().getX());
+            stmt.setInt(5, this.getPosition().getY());
+            stmt.setInt(6, this.getdegAtt());
             ResultSet id = stmt.executeQuery();
+            id.next();
             int id2 = id.getInt("idCreature");
             query = "INSERT INTO Humanoide(idCreature,pageEsq,agressif) VALUES ( ? , ? , ? )";
             stmt = connection.prepareStatement(query);
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1,String.valueOf(id2));
-            stmt.setString(2, String.valueOf(this.getpageEsq()));
-            stmt.setString(3, String.valueOf(true));
+            stmt.setInt(1,id2);
+            stmt.setInt(2, this.getpageEsq());
+            stmt.setBoolean(3, true);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);

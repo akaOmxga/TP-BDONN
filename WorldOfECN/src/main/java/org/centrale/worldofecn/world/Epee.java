@@ -114,19 +114,19 @@ public class Epee extends Objet {
             String query = "INSERT INTO Objet VALUES ( ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
-            stmt.setString(1,String.valueOf(idSauvegarde));
-            stmt.setString(2, String.valueOf(this.getPlace()));
-            stmt.setString(3, String.valueOf(this.getPrix()));
-            stmt.setString(4, String.valueOf(this.getPosition().getX()));
-            stmt.setString(5, String.valueOf(this.getPosition().getY()));
+            stmt.setInt(1,idSauvegarde);
+            stmt.setInt(2, this.getPlace());
+            stmt.setInt(3, this.getPrix());
+            stmt.setInt(4, this.getPosition().getX());
+            stmt.setInt(5, this.getPosition().getY());
             ResultSet id = stmt.executeQuery();
+            id.next();
             int id2 = id.getInt("idCreature");
             query = "INSERT INTO Categorie(idObjet,degBonus,nbMain) VALUES ( ? , ? , ?)";
             stmt = connection.prepareStatement(query);
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1,String.valueOf(id2));
-            stmt.setString(2, String.valueOf(this.degAtt));
-            stmt.setString(2, String.valueOf(this.nbMain));
+            stmt.setInt(1,id2);
+            stmt.setInt(2, this.degAtt);
+            stmt.setInt(2, this.nbMain);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);

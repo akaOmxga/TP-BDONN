@@ -97,7 +97,7 @@ public class DatabaseTools {
                 stmt.setString(1,nomJoueur);
                 stmt.setString(2,password);
                 ResultSet rs = stmt.executeQuery();
-                rs.next();
+                boolean exist = rs.next();
                 return rs.getInt("IDJoueur");
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,17 +114,18 @@ public class DatabaseTools {
      * @param monde
      */
 
-    public void saveWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
+    public void saveWorld(Integer idJoueur, String nomSauvegarde,int idMonde, World monde) {
         if (this.connection != null) {
             if (nomSauvegarde == null){
                 try {
                     String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(monde.getNBTour()));
-                    stmt.setString(2, String.valueOf(idMonde));
-                    stmt.setString(3, String.valueOf(idJoueur));
+                    stmt.setInt(1, monde.getNBTour());
+                    stmt.setInt(2, idMonde);
+                    stmt.setInt(3, idJoueur);
                     ResultSet id = stmt.executeQuery() ;
-                    int id2 = id.getInt("idCreature");
+                    id.next();
+                    int id2 = id.getInt("idSauvegarde");
                     for (ElementDeJeu e: monde.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     } 
@@ -134,13 +135,13 @@ public class DatabaseTools {
             }
             else {
                 try {
-                    String query = "INSERT INTO Sauvegarde VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
+                    String query = "INSERT INTO Sauvegarde (idMonde,nbtour,nom) VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(idMonde));
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
+                    stmt.setInt(1, idMonde);
+                    stmt.setInt(2, monde.getNBTour());
                     stmt.setString(3, nomSauvegarde);
                     ResultSet id = stmt.executeQuery() ;
-                    int id2 = id.getInt("idCreature");
+                    int id2 = id.getInt("idSauvegarde");
                     for (ElementDeJeu e: monde.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     }
@@ -158,19 +159,68 @@ public class DatabaseTools {
      * @param nomSauvegarde
      * @param monde
      */
-    
+    /*
     public void readWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            if (nomSauvegarde == null){
+            if (nomSauvegarde == null){ // Pour une Sauvegarde Rapide
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(idMonde));
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, String.valueOf(idMonde));
-                    stmt.setString(4, String.valueOf(idJoueur));
-                    stmt.executeUpdate();
-                } catch (SQLException ex) {
+                    // Creation du Monde 
+                    String query1 = "INSERT INTO Monde(idJoueur, Largeur, Hauteur) values (?,?,?)";
+                    PreparedStatement stmt1 = connection.prepareStatement(query1);
+                    stmt1.setString(1, String.valueOf(idJoueur));
+                    stmt1.setString(2, String.valueOf(monde.getWidth()));
+                    stmt1.setString(3, String.valueOf(monde.getHeight()));
+                    stmt1.executeUpdate();
+                    // Charger le World monde : Creature 
+                    String query2 = "SELECT * FROM Creature INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Creature.idSauvegarde";
+                    PreparedStatement stmt2 = connection.prepareStatement(query2);
+                    stmt2.executeQuery();
+                    ResultSet rs2 = stmt2.executeQuery();
+                    // Creation des Creatures
+                    while (rs2.next()) {
+                        // Récupération des attributs de la créature depuis le ResultSet
+                        ArrayList statCreature = Creature.getStat(rs2);
+                       
+                        // Récupération de l'Humanoide associé 
+                        String query2_1 = "SELECT * FROM Humanoide INNER JOIN Creature ON Creature.idCreature = Humanoide.idCreature WHERE Humanoide.idCreature = ?";
+                        stmt1.setString(1, String.valueOf(idJoueur));
+                        PreparedStatement stmt2_1 = connection.prepareStatement(query2_1);
+                        stmt2_1.executeQuery();
+                        ResultSet rs2_1 = stmt2_1.executeQuery();
+                        
+                        // filtrage du type de la Creature et Creation de l'objet o : 
+                        
+                        if (rs2_1.getString('nom') == null){ // il s'agit d'une Creature 
+                            if (rs2_1.getInt('NbFleche') != null){ // il s'agit d'un Archer
+                            
+                                }
+                            else if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Guerrier
+                            
+                                }
+                            else { // il s'agit d'un Paysan
+                                    
+                                }
+                            }
+                        else { // il s'agit d'un monstre
+                            if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Loup
+                                
+                                }
+                            else { // il s'agit d'un lapin
+                                
+                                }
+                            }
+                        
+                        }
+                        // Créer l'ElementDeJeu à partir de la Creature o et ajout au tableau
+                        monde.listElements.add(ElementDeJeu e);
+                    
+                    // Charger le World monde : Objet 
+                    String query3 = "SELECT * FROM Objet INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Objet.idSauvegarde";
+                    PreparedStatement stmt3 = connection.prepareStatement(query3);
+                    stmt3.executeQuery();
+                    ResultSet rs3 = stmt3.executeQuery(); 
+                    }
+                catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

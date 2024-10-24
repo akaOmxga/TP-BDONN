@@ -228,7 +228,6 @@ public class World {
     private void generate() {
         Random rand = new Random();
 
-        generatePlayer(1);
 
         generatePersonnages(rand.nextInt(MAXPEOPLE));
         generateMonsters(rand.nextInt(MAXMONSTERS));
@@ -267,5 +266,9 @@ public class World {
             
             // get world for Player ID
         }
+    }
+    
+    public void setPlayer(String name) {
+        this.player.getPersonnage().setNom(name);
     }
 }
