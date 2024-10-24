@@ -19,22 +19,82 @@ public abstract class ElementDeJeu {
     private Point2D position;
     
     /**
-     * generate element in the world
-     * @param world
+     * pos est la position de l'ElementDeJeu
      */
-    public ElementDeJeu(World world) {
-        super();
-        
-        Random rand = new Random();
-        this.position = new Point2D(rand.nextInt(world.getWidth()), rand.nextInt(world.getHeight()));
+    
+    private Point2D pos;
+    private World jeu;
+    
+    /** 
+     * Premier constructeur de ElementDeJeu
+     *@param p est la position de l'ElementDeJeu
+     */
+    public ElementDeJeu(Point2D p,World jeu){
+        this.pos = p;
+        this.jeu = jeu;
     }
-
-    public Point2D getPosition() {
-        return position;
+    
+    /**
+     * Deuxième constructeur de Monstre
+     * @param e est un autre ElementDeJeu, à partir de laquel notre ElementDeJeu sera créé
+     */
+    
+    public ElementDeJeu(ElementDeJeu e){
+        this.pos = e.pos;
+        this.jeu = e.jeu;
     }
-
-    public void setPosition(Point2D position) {
-        this.position = position;
+    
+    /**
+     * Troisème contructeur de Monstre, permet d'initialiser tous les attributs avec leur valeur par défaut.
+     */
+    
+    public ElementDeJeu(){
+        this.pos = new Point2D();
+        jeu = null;
+    }
+    
+    /**
+     * isObjet permet de savoir, grâce à un booléen, si l'ElementDeJeu est un Objet.
+     */
+    
+    public boolean isObjet(){
+        return (this instanceof Objet);
+    }
+    
+    /**
+     * isCreature permet de savoir, grâce à un booléen, si l'ElementDeJeu est une Creature.
+     */
+    
+    public boolean isCreature(){
+        return (this instanceof Creature);
+    }
+    
+    public World getjeu(){
+        return jeu;
+    }
+    
+    
+    public void setpos(int x, int y){
+        pos.setPosition(x,y);
+    }
+    
+    public int getposX(){
+        return pos.getX();
+    }
+    
+    public int getposY(){
+        return pos.getY();
+    }
+    
+    /**
+     * distance permet de calculer la distance entre deux Creatures
+     * @param c est la Creature avec laquelle nous calculons la distance
+     * @return 
+     */
+    
+    
+    public float distance (ElementDeJeu c){
+        return this.pos.distance(c.pos);
     }
     
     /**

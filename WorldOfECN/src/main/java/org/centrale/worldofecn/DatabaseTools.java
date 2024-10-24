@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.centrale.worldofecn.world.Creature;
+import org.centrale.worldofecn.world.ElementDeJeu;
+import org.centrale.worldofecn.world.Guerrier;
 
 
 import org.centrale.worldofecn.world.World;
@@ -116,12 +118,11 @@ public class DatabaseTools {
         if (this.connection != null) {
             if (nomSauvegarde == null){
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, monde.getlistElements().toString());
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, String.valueOf(idMonde));
-                    stmt.setString(4, String.valueOf(idJoueur));
+                    stmt.setString(1, String.valueOf(monde.getNBTour()));
+                    stmt.setString(2, String.valueOf(idMonde));
+                    stmt.setString(3, String.valueOf(idJoueur));
                     stmt.executeUpdate();
                 } catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -129,15 +130,35 @@ public class DatabaseTools {
             }
             else {
                 try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = ? , nbTour = ?, nom = ? WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
+                    String query = "INSERT INTO Sauvegarde VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, monde.getlistElements().toString());
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, nomSauvegarde);
-                    stmt.setString(4, nomSauvegarde);
-                    stmt.setString(5, String.valueOf(idMonde));
-                    stmt.setString(6, String.valueOf(idJoueur));
-                    stmt.executeUpdate();
+                    stmt.setString(4, String.valueOf(idMonde));
+                    stmt.setString(1, String.valueOf(monde.getNBTour()));
+                    stmt.setString(2, nomSauvegarde);
+                    ResultSet id = stmt.executeQuery() ;
+                    
+                    for (ElementDeJeu e: monde.getlistElements()){
+                        if (e instanceof Creature c ){
+                            query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+                            stmt.setString(1,String.valueOf(id));
+                            stmt.setString(2, String.valueOf(c.getPtVie()));
+                            stmt.setString(3, String.valueOf(c.getpageAtt()));
+                            stmt.setString(4, String.valueOf(c.getPosition().getX()));
+                            stmt.setString(5, String.valueOf(c.getPosition().getY()));
+                            stmt.setString(6, String.valueOf(c.getdegAtt()));
+                            id = stmt.executeQuery();
+                            if (c instanceof Guerrier g){ 
+                                query = "INSERT INTO Creature(idCreature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+                                stmt.setString(1,String.valueOf(id));
+                                stmt.setString(2, String.valueOf(g.getPtPar));
+                                stmt.setString(3, String.valueOf(c.getpagePar()));
+                                stmt.setString(4, String.valueOf(c.getnom));
+                                id = stmt.executeQuery();
+                                
+                            }
+                        }
+                    }
+                    
                 } catch (SQLException ex) {
                     Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -180,15 +201,33 @@ public class DatabaseTools {
                         PreparedStatement stmt2_1 = connection.prepareStatement(query2_1);
                         stmt2_1.executeQuery();
                         ResultSet rs2_1 = stmt2_1.executeQuery();
-
                         
+                        // filtrage du type de la Creature et Creation de l'objet o : 
                         
-
-                        // Récupérer les autres attributs si nécessaire
-
-                        // Création d'un objet Creature pour chaque ligne / int ptVie,int dAtt, int ptP,int pageA, int pageP,Point2D p,World jeu, List<Utilisable> effets
-                        // Creature creature = new Creature(id, nom, niveau);
+                        if (rs2_1.getString('nom') == null){ // il s'agit d'une Creature 
+                            if (rs2_1.getInt('NbFleche') != null){ // il s'agit d'un Archer
+                            
+                                }
+                            else if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Guerrier
+                            
+                                }
+                            else { // il s'agit d'un Paysan
+                                    
+                                }
+                            }
+                        else { // il s'agit d'un monstre
+                            if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Loup
+                                
+                                }
+                            else { // il s'agit d'un lapin
+                                
+                                }
+                            }
+                        
                         }
+                        // Créer l'ElementDeJeu à partir de la Creature o et ajout au tableau
+                        monde.listElements.add(ElementDeJeu e);
+                    
                     // Charger le World monde : Objet 
                     String query3 = "SELECT * FROM Objet INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Objet.idSauvegarde";
                     PreparedStatement stmt3 = connection.prepareStatement(query3);
@@ -224,17 +263,22 @@ public class DatabaseTools {
      * @param nomSauvegarde
      * @param monde
      */
+    
     public void removeWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
         if (this.connection != null) {
-            String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE "
-                    + "idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)";
-            PreparedStatement stmt = connect.prepareStatement(query);
-            stmt.setString(1, idMonde);
-            stmt.setString(2, idJoueur);
-            stmt.executeUpdate();
-        }
-        else {
-            return(null);
+            if (nomSauvegarde == null){
+                try {
+                    String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE "
+                        + "idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, monde.getlistElements().toString());
+                stmt.setString(2, String.valueOf(monde.getNBTour()));
+                stmt.setString(3, String.valueOf(idMonde));
+                stmt.setString(4, String.valueOf(idJoueur));
+                } catch (SQLException ex) {
+                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
+                }     
+            }
         }
     }
 }
