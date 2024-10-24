@@ -11,9 +11,17 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.centrale.worldofecn.world.Archer;
 import org.centrale.worldofecn.world.Creature;
 import org.centrale.worldofecn.world.ElementDeJeu;
+import org.centrale.worldofecn.world.Epee;
 import org.centrale.worldofecn.world.Guerrier;
+import org.centrale.worldofecn.world.Lapin;
+import org.centrale.worldofecn.world.Loup;
+import org.centrale.worldofecn.world.Paysan;
+import org.centrale.worldofecn.world.Point2D;
+import org.centrale.worldofecn.world.PotionSoin;
+import org.centrale.worldofecn.world.Utilisable;
 
 
 import org.centrale.worldofecn.world.World;
@@ -97,7 +105,7 @@ public class DatabaseTools {
                 stmt.setString(1,nomJoueur);
                 stmt.setString(2,password);
                 ResultSet rs = stmt.executeQuery();
-                rs.next();
+                boolean exist = rs.next();
                 return rs.getInt("IDJoueur");
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,17 +122,18 @@ public class DatabaseTools {
      * @param monde
      */
 
-    public void saveWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
+    public void saveWorld(Integer idJoueur, String nomSauvegarde,int idMonde, World monde) {
         if (this.connection != null) {
             if (nomSauvegarde == null){
                 try {
                     String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(monde.getNBTour()));
-                    stmt.setString(2, String.valueOf(idMonde));
-                    stmt.setString(3, String.valueOf(idJoueur));
+                    stmt.setInt(1, monde.getNBTour());
+                    stmt.setInt(2, idMonde);
+                    stmt.setInt(3, idJoueur);
                     ResultSet id = stmt.executeQuery() ;
-                    int id2 = id.getInt("idCreature");
+                    id.next();
+                    int id2 = id.getInt("idSauvegarde");
                     for (ElementDeJeu e: monde.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     } 
@@ -134,13 +143,13 @@ public class DatabaseTools {
             }
             else {
                 try {
-                    String query = "INSERT INTO Sauvegarde VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
+                    String query = "INSERT INTO Sauvegarde (idMonde,nbtour,nom) VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, String.valueOf(idMonde));
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
+                    stmt.setInt(1, idMonde);
+                    stmt.setInt(2, monde.getNBTour());
                     stmt.setString(3, nomSauvegarde);
                     ResultSet id = stmt.executeQuery() ;
-                    int id2 = id.getInt("idCreature");
+                    int id2 = id.getInt("idSauvegarde");
                     for (ElementDeJeu e: monde.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     }
@@ -257,32 +266,32 @@ public class DatabaseTools {
     private ElementDeJeu createCreatureFromResultSet(ResultSet rs, World monde) throws SQLException { 
         // attributs des creatures                    
         int hp = rs.getInt("HP");                     
-        int pageAtt = rs.getInt("pageAtt");                
+        int pagePar = rs.getInt("pagePar");    
+        int ptPar = rs.getInt("ptPar");
         int x = rs.getInt("x");                               
         int y = rs.getInt("y");                             
         int degAtt = rs.getInt("DegAtt");   
-        int pEsq = rs.getInt("pEsq");
+        int pEsq = rs.getInt("pageEsq");
 
         String nom = rs.getString("nom");
         if (nom != null) {
             // C'est un humanoïde
             boolean estAgressif = rs.getBoolean("aggressif");
             int nbFleches = rs.getInt("NbFleche");
-
-            if (nbFleches > 0) {
-                return new Archer(nom, hp, degAtt, pEsq, pageAtt, 5, new Point2D(x,y), nbFleches, monde, new List<Utilisable>());
+            if (nbFleches > 0) {                       
+                return new Archer(nom, hp, degAtt, pEsq, pagePar, ptPar, 5, new Point2D(x,y), nbFleches, 0, monde, new ArrayList<>());
             } else if (estAgressif) {
-                return new Guerrier(nom, hp, degAtt, pEsq, pageAtt, 1, new Point2D(x,y), monde, new List<Utilisable>());
+                return new Guerrier(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, 0, 0, 0, 0, monde, new ArrayList<>());
             } else {
-                return new Paysan(nom, hp, degAtt, pEsq, pageAtt, 1, new Point2D(x,y), monde, new List<Utilisable>());
+                return new Paysan(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, monde, new ArrayList<>());
             }
-        } else {   //Loup(int pEsq, int pV,int dA,int paAtt,Point2D p,World jeu, List<Utilisable> effets // Lapin(int pageEsq,int pV,int dA,int paAtt,Point2D p,World jeu, List<Utilisable> effets)
+        } else {  
             // C'est un monstre
             boolean estAgressif = rs.getBoolean("aggressif");
             if (estAgressif) {
-                return new Loup(pEsq, hp, degAtt, pageAtt, new Point2D(x,y), monde, new List<Utilisable>());
+                return new Loup(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
             } else {
-                return new Lapin(pEsq, hp, degAtt, pageAtt, new Point2D(x,y), monde, new List<Utilisable>());
+                return new Lapin(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
             }
         }
     }

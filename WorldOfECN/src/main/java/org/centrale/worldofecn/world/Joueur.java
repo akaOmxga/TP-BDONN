@@ -35,7 +35,6 @@ public class Joueur implements Deplacable{
     
     /**
      *
-     * @param nom
      */
     public Joueur(World jeu) {
         this(null, null,jeu);
@@ -83,8 +82,8 @@ public class Joueur implements Deplacable{
             int place = 0;
             role = new Guerrier(nom,ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,jeu, new ArrayList<Utilisable>());
         }
-        this.login = login;
-        this.password = password;
+        this.login = "test";
+        this.password = "aze";
     }
 
     /**
@@ -158,22 +157,22 @@ public class Joueur implements Deplacable{
             String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
-            stmt.setString(1,String.valueOf(idSauvegarde));
-            stmt.setString(2, String.valueOf(this.role.getptVie()));
-            stmt.setString(3, String.valueOf(this.role.getpageAtt()));
-            stmt.setString(4, String.valueOf(this.role.getPosition().getX()));
-            stmt.setString(5, String.valueOf(this.role.getPosition().getY()));
-            stmt.setString(6, String.valueOf(this.role.getdegAtt()));
+            stmt.setInt(1,idSauvegarde);
+            stmt.setInt(2, this.role.getptVie());
+            stmt.setInt(3, this.role.getpageAtt());
+            stmt.setInt(4, this.role.getPosition().getX());
+            stmt.setInt(5, this.role.getPosition().getY());
+            stmt.setInt(6, this.role.getdegAtt());
             ResultSet id = stmt.executeQuery();
             int id2 = id.getInt("idCreature");
             if (this.role instanceof Guerrier g){
                 query = "INSERT INTO Humanoide(idCreature,ptPar,agressif,pagePar,nom) VALUES ( ? , ? , ? , ? , ? ) RETURNING idHumanoide";
                 stmt = connection.prepareStatement(query);
                 stmt = connection.prepareStatement(query);
-                stmt.setString(1,String.valueOf(id2));
-                stmt.setString(2, String.valueOf(g.getptPar()));
-                stmt.setString(3, String.valueOf(true));
-                stmt.setString(4, String.valueOf(g.getpagePar()));
+                stmt.setInt(1,id2);
+                stmt.setInt(2, g.getptPar());
+                stmt.setBoolean(3, true);
+                stmt.setInt(4, g.getpagePar());
                 stmt.setString(5, this.role.getNom());
                 stmt.executeUpdate();
                 if(g.getarme()!=null){
@@ -183,11 +182,11 @@ public class Joueur implements Deplacable{
                 query = "INSERT INTO Humanoide(idCreature,ptPar,agressif,pagePar,nom) VALUES ( ? , ? , ? , ? , ? ) RETURNING idHumanoide";
                 stmt = connection.prepareStatement(query);
                 stmt = connection.prepareStatement(query);
-                stmt.setString(1,String.valueOf(id2));
-                stmt.setString(2, String.valueOf(a.getptPar()));
-                stmt.setString(3, String.valueOf(a.getnbFleches()));
-                stmt.setString(4, String.valueOf(true));
-                stmt.setString(5, String.valueOf(a.getpagePar()));
+                stmt.setInt(1,id2);
+                stmt.setInt(2, a.getptPar());
+                stmt.setInt(3, a.getnbFleches());
+                stmt.setBoolean(4, true);
+                stmt.setInt(5, a.getpagePar());
                 stmt.setString(6, a.getNom());
                 stmt.executeUpdate();
             }
