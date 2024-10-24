@@ -8,9 +8,14 @@
 package org.centrale.worldofecn.world;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -241,10 +246,11 @@ public class World {
      * @param gameName
      * @param saveName
      */
-    public void saveToDatabase(Connection connection, String gameName, String saveName) {
+    public void getToDatabase(Connection connection, String gameName, String saveName) {
         if (connection != null) {
             // Get Player ID
-
+            this.setHeightWidth(0, 0);
+            init();
             // Save world for Player ID
         }
     }
@@ -253,18 +259,22 @@ public class World {
      * Get world from database
      *
      * @param connection
-     * @param gameName
-     * @param saveName
+     * @param idmonde
+     * @param idJoueur
      */
-    public void getFromDatabase(Connection connection, String gameName, String saveName) {
+    public void saveToDatabase(Connection connection,int idmonde , int  idJoueur) {
         if (connection != null) {
-            // Remove old data
-            this.setHeightWidth(0, 0);
-            init();
-
-            // Get Player ID
-            
-            // get world for Player ID
+            try {
+                String query = "INSERT INTO Monde (idMonde,idJoueur,largeur,hauteur) VALUES (?, ?, ?, ? )";
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setInt(1, idmonde);
+                stmt.setInt(2, idJoueur);
+                stmt.setInt(3, this.width);
+                stmt.setInt(4, this.height);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

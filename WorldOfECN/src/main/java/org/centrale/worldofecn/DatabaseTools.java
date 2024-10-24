@@ -114,19 +114,20 @@ public class DatabaseTools {
      * @param monde
      */
 
-    public void saveWorld(Integer idJoueur, String nomSauvegarde,int idMonde, World monde) {
+    public void saveWorld(Integer idJoueur, String nomSauvegarde,int idMonde, World mondee) {
         if (this.connection != null) {
             if (nomSauvegarde == null){
                 try {
+                    //mondee.saveToDatabase(connection, idMonde, idJoueur);
                     String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setInt(1, monde.getNBTour());
+                    stmt.setInt(1, mondee.getNBTour());
                     stmt.setInt(2, idMonde);
                     stmt.setInt(3, idJoueur);
                     ResultSet id = stmt.executeQuery() ;
                     id.next();
                     int id2 = id.getInt("idSauvegarde");
-                    for (ElementDeJeu e: monde.getlistElements()){
+                    for (ElementDeJeu e: mondee.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     } 
                 } catch (SQLException ex) {
@@ -135,14 +136,16 @@ public class DatabaseTools {
             }
             else {
                 try {
+                    //mondee.saveToDatabase(connection, idMonde, idJoueur);
                     String query = "INSERT INTO Sauvegarde (idMonde,nbtour,nom) VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
                     stmt.setInt(1, idMonde);
-                    stmt.setInt(2, monde.getNBTour());
+                    stmt.setInt(2, mondee.getNBTour());
                     stmt.setString(3, nomSauvegarde);
                     ResultSet id = stmt.executeQuery() ;
+                    id.next();
                     int id2 = id.getInt("idSauvegarde");
-                    for (ElementDeJeu e: monde.getlistElements()){
+                    for (ElementDeJeu e: mondee.getlistElements()){
                         e.saveToDatabase(connection,id2);
                     }
                 } catch (SQLException ex) {
