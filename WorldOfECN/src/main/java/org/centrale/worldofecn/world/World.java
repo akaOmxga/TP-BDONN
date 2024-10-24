@@ -277,6 +277,9 @@ public class World {
             }
         }
     }
+    public void setNbTour(int nbTour){
+        this.nbTour = nbTour;
+    }
     
     public void setPlayer(String name) {
         this.player.getPersonnage().setNom(name);

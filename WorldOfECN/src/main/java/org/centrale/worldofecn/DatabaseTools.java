@@ -11,9 +11,17 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.centrale.worldofecn.world.Archer;
 import org.centrale.worldofecn.world.Creature;
 import org.centrale.worldofecn.world.ElementDeJeu;
+import org.centrale.worldofecn.world.Epee;
 import org.centrale.worldofecn.world.Guerrier;
+import org.centrale.worldofecn.world.Lapin;
+import org.centrale.worldofecn.world.Loup;
+import org.centrale.worldofecn.world.Paysan;
+import org.centrale.worldofecn.world.Point2D;
+import org.centrale.worldofecn.world.PotionSoin;
+import org.centrale.worldofecn.world.Utilisable;
 
 
 import org.centrale.worldofecn.world.World;
@@ -158,116 +166,297 @@ public class DatabaseTools {
     /**
      * read database to world
      * @param idJoueur
-     * @param idMonde
-     * @param nomSauvegarde
-     * @param monde
-     */
-    /*
-    public void readWorld(Integer idJoueur, Integer idMonde, String nomSauvegarde, World monde) {
-        if (this.connection != null) {
-            if (nomSauvegarde == null){ // Pour une Sauvegarde Rapide
-                try {
-                    // Creation du Monde 
-                    String query1 = "INSERT INTO Monde(idJoueur, Largeur, Hauteur) values (?,?,?)";
-                    PreparedStatement stmt1 = connection.prepareStatement(query1);
-                    stmt1.setString(1, String.valueOf(idJoueur));
-                    stmt1.setString(2, String.valueOf(monde.getWidth()));
-                    stmt1.setString(3, String.valueOf(monde.getHeight()));
-                    stmt1.executeUpdate();
-                    // Charger le World monde : Creature 
-                    String query2 = "SELECT * FROM Creature INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Creature.idSauvegarde";
-                    PreparedStatement stmt2 = connection.prepareStatement(query2);
-                    stmt2.executeQuery();
-                    ResultSet rs2 = stmt2.executeQuery();
-                    // Creation des Creatures
-                    while (rs2.next()) {
-                        // Récupération des attributs de la créature depuis le ResultSet
-                        ArrayList statCreature = Creature.getStat(rs2);
-                       
-                        // Récupération de l'Humanoide associé 
-                        String query2_1 = "SELECT * FROM Humanoide INNER JOIN Creature ON Creature.idCreature = Humanoide.idCreature WHERE Humanoide.idCreature = ?";
-                        stmt1.setString(1, String.valueOf(idJoueur));
-                        PreparedStatement stmt2_1 = connection.prepareStatement(query2_1);
-                        stmt2_1.executeQuery();
-                        ResultSet rs2_1 = stmt2_1.executeQuery();
-                        
-                        // filtrage du type de la Creature et Creation de l'objet o : 
-                        
-                        if (rs2_1.getString('nom') == null){ // il s'agit d'une Creature 
-                            if (rs2_1.getInt('NbFleche') != null){ // il s'agit d'un Archer
-                            
-                                }
-                            else if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Guerrier
-                            
-                                }
-                            else { // il s'agit d'un Paysan
-                                    
-                                }
-                            }
-                        else { // il s'agit d'un monstre
-                            if (rs2_1.getBoolean('aggressif')){ // il s'agit d'un Loup
-                                
-                                }
-                            else { // il s'agit d'un lapin
-                                
-                                }
-                            }
-                        
-                        }
-                        // Créer l'ElementDeJeu à partir de la Creature o et ajout au tableau
-                        monde.listElements.add(ElementDeJeu e);
-                    
-                    // Charger le World monde : Objet 
-                    String query3 = "SELECT * FROM Objet INNER JOIN Sauvegarde ON Sauvegarde.idSauvegarde = Objet.idSauvegarde";
-                    PreparedStatement stmt3 = connection.prepareStatement(query3);
-                    stmt3.executeQuery();
-                    ResultSet rs3 = stmt3.executeQuery(); 
-                    }
-                catch (SQLException ex) {
-                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            else {
-                try {
-                    String query = "UPDATE Sauvegarde SET tableauMonde = (SELECT tableauMonde FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE idMonde = ?), nbTour = ?, nom = ?  WHERE nom = ? AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde";
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(5, String.valueOf(idMonde));
-                    stmt.setString(2, String.valueOf(monde.getNBTour()));
-                    stmt.setString(3, nomSauvegarde);
-                    stmt.setString(4, nomSauvegarde);
-                    stmt.setString(5, String.valueOf(idMonde));
-                    stmt.setString(6, String.valueOf(idJoueur));
-                    stmt.executeUpdate();
-                } catch (SQLException ex) {
-                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    /**
-     * get world from database
-     * @param idJoueur
-     * @param idMonde
+     * @param nomPartie
      * @param nomSauvegarde
      * @param monde
      */
     
-    public void removeWorld(Integer idJoueur, int idMonde, String nomSauvegarde, World monde) {
-        if (this.connection != null) {
-            if (nomSauvegarde == null){
-                try {
-                    String query = "DELETE FROM Sauvegarde INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde WHERE "
-                        + "idSauvegarde = (SELECT idSauvegarde FROM Sauvegarde WHERE idMonde = ? AND idJoueur = ?)";
-                PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, monde.getlistElements().toString());
-                stmt.setString(2, String.valueOf(monde.getNBTour()));
-                stmt.setString(3, String.valueOf(idMonde));
-                stmt.setString(4, String.valueOf(idJoueur));
-                } catch (SQLException ex) {
-                    Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
-                }     
+    public void readWorld(Integer idJoueur, String nomPartie, String nomSauvegarde, World monde) {
+        if (this.connection == null) {
+            throw new IllegalStateException("La connexion à la base de données n'est pas établie");
+        }
+
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String findSaveQuery;
+        
+        try {
+            if (nomSauvegarde == null) { // Sauvegarde Rapide
+                findSaveQuery = """
+                    SELECT s.idSauvegarde, s.NbTour, m.Largeur, m.Hauteur
+                    FROM Sauvegarde s
+                    JOIN Monde m ON s.idMonde = m.idMonde
+                    WHERE m.idJoueur = ? 
+                    AND s.nom = NULL""";
+                    }
+            else { // Sauvegarde classique
+                findSaveQuery = """
+                    SELECT s.idSauvegarde, s.NbTour, m.Largeur, m.Hauteur
+                    FROM Sauvegarde s
+                    JOIN Monde m ON s.idMonde = m.idMonde
+                    WHERE m.idJoueur = ? 
+                    AND s.nom = ?""";
+                  }
+            pstmt = connection.prepareStatement(findSaveQuery);
+            pstmt.setInt(1, idJoueur);
+            pstmt.setString(2, nomSauvegarde);
+            rs = pstmt.executeQuery();
+            if (!rs.next()) {
+                    throw new SQLException("Sauvegarde non trouvée");
+                }
+
+            int idSauvegarde = rs.getInt("idSauvegarde");
+            monde.setNbTour(rs.getInt("NbTour"));
+            monde.setWidth(rs.getInt("Largeur"));
+            monde.setHeight(rs.getInt("Hauteur"));
+            rs.close();
+            pstmt.close();
+
+            // Creature
+            String creatureQuery = """
+                SELECT c.*, h.*, r.*
+                FROM Creature c
+                LEFT JOIN Humanoide h ON c.idCreature = h.idCreature
+                LEFT JOIN Role r ON h.idHumanoide = r.idHumanode
+                WHERE c.idSauvegarde = ?""";
+
+            pstmt = connection.prepareStatement(creatureQuery);
+            pstmt.setInt(1, idSauvegarde);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                ElementDeJeu element = createCreatureFromResultSet(rs, monde);
+                if (element != null) {
+                    monde.getlistElements().add(element);
+                }
+            }
+            rs.close();
+            pstmt.close();
+
+            // Objet
+            String objetQuery = """
+                SELECT o.*, c.*
+                FROM Objet o
+                LEFT JOIN Categorie c ON o.idObjet = c.idObjet
+                WHERE o.idSauvegarde = ?""";
+
+            pstmt = connection.prepareStatement(objetQuery);
+            pstmt.setInt(1, idSauvegarde);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                ElementDeJeu element = createObjetFromResultSet(rs, monde);
+                if (element != null) {
+                    monde.getlistElements().add(element);
+                }
+            }
+                
+            }
+        catch (SQLException ex) {
+             System.out.println("Erreur" + ex);
+            throw new RuntimeException("Erreur lors de la lecture du monde", ex);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException ex) {
+                 System.out.println("Erreur" + ex);
+            }
+        }          
+    }
+
+    // Méthode utilitaire pour créer une créature à partir d'un ResultSet
+    private ElementDeJeu createCreatureFromResultSet(ResultSet rs, World monde) throws SQLException { 
+        // attributs des creatures                    
+        int hp = rs.getInt("HP");                     
+        int pagePar = rs.getInt("pagePar");    
+        int ptPar = rs.getInt("ptPar");
+        int x = rs.getInt("x");                               
+        int y = rs.getInt("y");                             
+        int degAtt = rs.getInt("DegAtt");   
+        int pEsq = rs.getInt("pageEsq");
+
+        String nom = rs.getString("nom");
+        if (nom != null) {
+            // C'est un humanoïde
+            boolean estAgressif = rs.getBoolean("aggressif");
+            int nbFleches = rs.getInt("NbFleche");
+            if (nbFleches > 0) {                       
+                return new Archer(nom, hp, degAtt, pEsq, pagePar, ptPar, 5, new Point2D(x,y), nbFleches, 0, monde, new ArrayList<>());
+            } else if (estAgressif) {
+                return new Guerrier(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, 0, 0, 0, 0, monde, new ArrayList<>());
+            } else {
+                return new Paysan(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, monde, new ArrayList<>());
+            }
+        } else {  
+            // C'est un monstre
+            boolean estAgressif = rs.getBoolean("aggressif");
+            if (estAgressif) {
+                return new Loup(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
+            } else {
+                return new Lapin(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
             }
         }
     }
+
+    // Méthode utilitaire pour créer un objet à partir d'un ResultSet
+    private ElementDeJeu createObjetFromResultSet(ResultSet rs, World monde) throws SQLException {
+        //PotionSoin(int nbPVRendu, int place,int prix,Point2D p,World jeu){
+        //Epee(int nbmain,int degEpee, int placeEpee,int prix, Point2D p,World jeu)
+        int x = rs.getInt("x");
+        int y = rs.getInt("y");
+        int place = rs.getInt("place");
+        int prix = rs.getInt("prix");
+
+        // Vérifier la catégorie de l'objet
+        int degBonus = rs.getInt("degBonus");
+        int nbMain = rs.getInt("nbMain");
+        Integer nbPvRendus = rs.getInt("nbPvRendus");
+
+        // Créer l'objet 
+        if (nbPvRendus != 0) { // Potion
+            return new PotionSoin(nbPvRendus, place, prix, new Point2D(x,y), monde);
+        } 
+        else { // Epee
+            return new Epee(nbMain, degBonus, place, prix, new Point2D(x,y), monde);
+        }
+    }
+
+    /**
+     * remove world from database
+     * @param idJoueur
+     * @param nomPartie
+     * @param nomSauvegarde
+     * @throws SQLException 
+     */
+    
+    public void removeWorld(int idJoueur, String nomPartie, String nomSauvegarde) throws SQLException {
+    if (nomPartie == null || nomSauvegarde == null) {
+        throw new IllegalArgumentException("Le nom de la partie et le nom de la sauvegarde ne peuvent pas être null");
+    }
+
+    PreparedStatement pstmt = null;
+    try {
+        // Début de la transaction
+        connection.setAutoCommit(false);
+
+        // Id de la Sauvegarde
+        String findSaveQuery = """
+            SELECT s.idSauvegarde 
+            FROM Sauvegarde s
+            JOIN Monde m ON s.idMonde = m.idMonde
+            WHERE m.idJoueur = ? 
+            AND s.nom = ?""";
+            
+        pstmt = connection.prepareStatement(findSaveQuery);
+        pstmt.setInt(1, idJoueur);
+        pstmt.setString(2, nomSauvegarde);
+        ResultSet rs = pstmt.executeQuery();
+        
+        if (!rs.next()) {
+            throw new SQLException("Aucune sauvegarde trouvée avec ces critères");
+        }
+        int idSauvegarde = rs.getInt("idSauvegarde");
+        rs.close();
+        pstmt.close();
+
+        // remove Categorie
+        String deleteCategories = """
+            DELETE FROM Categorie 
+            WHERE idObjet IN (
+                SELECT idObjet 
+                FROM Objet 
+                WHERE idSauvegarde = ?
+            )""";
+        pstmt = connection.prepareStatement(deleteCategories);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Personnage
+        String deletePersonnages = """
+            DELETE FROM Personnage 
+            WHERE idRole IN (
+                SELECT r.idRole 
+                FROM Role r
+                JOIN Humanode h ON r.idHumanode = h.idHumanoide
+                JOIN Creature c ON h.idCreature = c.idCreature
+                WHERE c.idSauvegarde = ?
+            )""";
+        pstmt = connection.prepareStatement(deletePersonnages);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Role
+        String deleteRoles = """
+            DELETE FROM Role 
+            WHERE idHumanoide IN (
+                SELECT h.idHumanoide 
+                FROM Humanode h
+                JOIN Creature c ON h.idCreature = c.idCreature
+                WHERE c.idSauvegarde = ?
+            )""";
+        pstmt = connection.prepareStatement(deleteRoles);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Humanoide
+        String deleteHumanoides = """
+            DELETE FROM Humanoide 
+            WHERE idCreature IN (
+                SELECT idCreature 
+                FROM Creature 
+                WHERE idSauvegarde = ?
+            )""";
+        pstmt = connection.prepareStatement(deleteHumanoides);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Creature
+        String deleteCreatures = "DELETE FROM Creature WHERE idSauvegarde = ?";
+        pstmt = connection.prepareStatement(deleteCreatures);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Object
+        String deleteObjets = "DELETE FROM Objet WHERE idSauvegarde = ?";
+        pstmt = connection.prepareStatement(deleteObjets);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+        pstmt.close();
+
+        // remove Sauvegarde
+        String deleteSauvegarde = "DELETE FROM Sauvegarde WHERE idSauvegarde = ?";
+        pstmt = connection.prepareStatement(deleteSauvegarde);
+        pstmt.setInt(1, idSauvegarde);
+        pstmt.executeUpdate();
+
+        // Valider la transaction
+        connection.commit();
+
+    } catch (SQLException e) {
+        // En cas d'erreur, annuler toutes les modifications
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Erreur" + ex);
+            }
+        }
+        throw e;
+    } finally {
+        // Restaurer l'auto-commit et fermer le PreparedStatement
+        if (connection != null) {
+            connection.setAutoCommit(true);
+        }
+        if (pstmt != null) {
+            pstmt.close();
+        }
+    }
 }
+}
+
