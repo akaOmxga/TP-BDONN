@@ -8,7 +8,12 @@
 package org.centrale.worldofecn.world;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -36,10 +41,34 @@ public class Paysan extends Personnage {
     /**
      *
      * @param connection
+     * @param idSauvegarde
      */
     @Override
-    public void saveToDatabase(Connection connection) {
-        
+    public void saveToDatabase(Connection connection, Integer idSauvegarde){
+        try {
+            String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(idSauvegarde));
+            stmt.setString(2, String.valueOf(this.getptVie()));
+            stmt.setString(3, String.valueOf(this.getpageAtt()));
+            stmt.setString(4, String.valueOf(this.getPosition().getX()));
+            stmt.setString(5, String.valueOf(this.getPosition().getY()));
+            stmt.setString(6, String.valueOf(this.getdegAtt()));
+            ResultSet id = stmt.executeQuery();
+            int id2 = id.getInt("idCreature");
+            query = "INSERT INTO Humanoide(idCreature,ptPar,agressif,pagePar,nom) VALUES ( ? , ? , ? , ? , ? ) RETURNING idCreature";
+            stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(id2));
+            stmt.setString(2, String.valueOf(this.getptPar()));
+            stmt.setString(3, String.valueOf(false));
+            stmt.setString(4, String.valueOf(this.getpagePar()));
+            stmt.setString(5, this.getNom());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     /**

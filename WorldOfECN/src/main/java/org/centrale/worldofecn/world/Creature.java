@@ -9,6 +9,9 @@ package org.centrale.worldofecn.world;
 
 import java.lang.Integer;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +21,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.centrale.worldofecn.DatabaseTools;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -38,9 +43,7 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
     
     private int ptVie ; 
     private int degAtt;
-    private int ptPar;
     private int pageAtt;
-    private int pagePar;
     private List<Utilisable> effets;
     
     /**
@@ -55,13 +58,10 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
      * @param effets est une Collection List de Utilisable contenant les effets appliqués aux joueurs pendant le tour
      */
     
-    public Creature(int ptVie,int dAtt, int ptP,int pageA, int pageP,Point2D p,World jeu, List<Utilisable> effets){ 
+    public Creature(int ptVie,int dAtt, int pageP,Point2D p,World jeu, List<Utilisable> effets){ 
         super(p,jeu);
         this.ptVie = ptVie; 
         degAtt = dAtt;
-        ptPar = ptP;
-        pageAtt = pageA;
-        pagePar = pageP;
         this.effets = effets;
     }
     
@@ -74,9 +74,7 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
         super(c);
         ptVie = c.ptVie;
         degAtt = c.degAtt;
-        ptPar = c.ptPar;
         pageAtt = c.pageAtt;
-        pagePar = c.pagePar;
         effets = c.effets;
     }
     
@@ -86,7 +84,7 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
      */
     
     public Creature(World jeu){
-        this(0,0,0,0,0,new Point2D(),jeu, new ArrayList<>());
+        this(0,0,0,new Point2D(),jeu, new ArrayList<>());
     }
     
     /**
@@ -108,14 +106,7 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
         return degAtt;
     } 
     
-    /**
-     * getptPar renvoie le nombre de dégat que la Creature pare a chaque parade réussie
-     * @return ptPar est le nombre de dégat que la Creature pare a chaque parade réussie
-     */
-    
-    public int getptPar(){
-        return ptPar;
-    }
+
     
     /**
      * getpageAttt renvoie le pourcentage de chance qu'une attaque de la Creature soit réussie
@@ -124,15 +115,6 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
     
     public int getpageAtt(){
         return pageAtt;
-    }
-    
-    /**
-     * getpagePar renvoie le pourcentage de chance qu'une parade de la Creature soit réussie
-     * @return pagePar est le pourcentage de chance qu'une parade de la Creature soit réussie
-     */
-    
-    public int getpagePar(){
-        return pagePar;
     }
     
     /**
@@ -154,30 +136,12 @@ public abstract class Creature extends ElementDeJeu implements Deplacable{
     } 
     
     /**
-     * setptPar permet d'attribuer la valeur ptP aux dégât parés ptPar de la Creature
-     * @param ptP est le nombre de dégat que la Creature pare a chaque parade réussie
-     */
-    
-    public void setptPar(int ptP){
-        ptPar = ptP;
-    }
-    
-    /**
      * setpageAtt permet d'attribuer la valeur pageA aux pourcentages d'attaque réussie pageAtt de la Creature
      * @param pageA est le pourcentage de chance qu'une attaque de la Creature soit réussie
      */
     
     public void setpageAtt(int pageA){
         pageAtt = pageA;
-    }
-    
-    /**
-     * setpagePar permet d'attribuer la valeur pageP aux pourcentages de parade réussie pagePar de la Creature
-     * @param pageP est le pourcentage de chance qu'une parade de la Creature soit réussie
-     */
-    
-    public void setpagePar(int pageP){
-        pagePar = pageP;
     }
     
     /**

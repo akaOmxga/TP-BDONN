@@ -54,7 +54,7 @@ public class World {
      */
     private void init() {
         this.listElements = new LinkedList();
-        this.player = new Joueur("Player");
+        this.player = new Joueur(this);
     }
     /**
      * 
@@ -234,16 +234,7 @@ public class World {
         generateMonsters(rand.nextInt(MAXMONSTERS));
         generateObjects(rand.nextInt(MAXOBJECTS));
     }
-
-    /**
-     * Set Player name
-     *
-     * @param name
-     */
-    public void setPlayer(String name) {
-        this.player.setNom(name);
-    }
-
+    
     /**
      * Save world to database
      *

@@ -9,8 +9,13 @@
 package org.centrale.worldofecn.world;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,18 +26,17 @@ public class Loup extends Monstre implements Combattant{
     /**
      * Premier constructeur de Loup
      * 
+     * @param pEsq
      * @param pV est le nombre de point de vie du Loup
      * @param dA est le nombre de dégât d'attaque du Loup
-     * @param ptPar est le nombre de dégat que le Loup pare a chaque parade réussie
      * @param paAtt est le pourcentage de chance qu'une attaque du Loup soit réussie
-     * @param paPar est le pourcentage de chance qu'une parade du Loup soit réussie
      * @param p est la position du Loup
      * @param jeu est la représentation matricielle de la carte
      * @param effets est une Collection List de Utilisable contenant les effets appliqués aux joueurs pendant le tour 
      */
     
-    public Loup(int pV,int dA,int ptPar,int paAtt,int paPar,Point2D p,World jeu, List<Utilisable> effets){
-      super(pV,dA,ptPar,paAtt,paPar,p,jeu, effets);
+    public Loup(int pEsq, int pV,int dA,int paAtt,Point2D p,World jeu, List<Utilisable> effets){
+      super(pEsq,pV,dA,paAtt,p,jeu, effets);
     }
     
     /**
@@ -46,6 +50,7 @@ public class Loup extends Monstre implements Combattant{
     
     /**
      * Troisème contructeur de Loup, permet d'initialiser tous les attributs avec leur valeur par défaut.
+     * @param jeu
      */
 
     public Loup(World jeu){
@@ -60,26 +65,57 @@ public class Loup extends Monstre implements Combattant{
     
     @Override
     public void combattre(Creature c){
-        if (this.distance(c)<=1){
-            Random genAlé = new Random();
-            int pourcAtt = genAlé.nextInt(100);
-            int pourcPar = genAlé.nextInt(100);
-            if (pourcAtt <= this.getpageAtt() && pourcPar>c.getpagePar()){
-                c.setptVie(c.getptVie() - this.getdegAtt());
+      if (this.distance(c)<=1){
+          Random genAlé = new Random();
+          int pourcAtt = genAlé.nextInt(100);
+          int pourcPar = genAlé.nextInt(100);
+          if (c instanceof Personnage p){
+            if (pourcAtt <= this.getpageAtt() && pourcPar>p.getpagePar()){
+                p.setptVie(p.getptVie() - this.getdegAtt());
+                System.out.println("l'attaque du Guerrier est un succès");
             }
-            else if (pourcAtt <= this.getpageAtt() && pourcPar<=c.getpagePar() && this.getdegAtt() - c.getptPar() >0){
-                c.setptVie(c.getptVie() - this.getdegAtt() + c.getptPar());
+            else if (pourcAtt <= this.getpageAtt() && pourcPar<=p.getpagePar() && this.getdegAtt() - p.getptPar() >0){
+                p.setptVie(p.getptVie() - this.getdegAtt() + p.getptPar());
+                System.out.println("l'attaque du Guerrier est contrée");
             }
-      }
+          }
+          if (c instanceof Monstre m){
+            if (pourcAtt <= this.getpageAtt() && pourcPar>m.getpageEsq()){
+                m.setptVie(m.getptVie() - this.getdegAtt());
+                System.out.println("l'attaque du Guerrier est un succès");
+            }
+          }
     }
+  }
     
      /**
      *
      * @param connection
      */
     @Override
-    public void saveToDatabase(Connection connection) {
-        
+    public void saveToDatabase(Connection connection,Integer idSauvegarde) {
+        try {
+            String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(idSauvegarde));
+            stmt.setString(2, String.valueOf(this.getptVie()));
+            stmt.setString(3, String.valueOf(this.getpageAtt()));
+            stmt.setString(4, String.valueOf(this.getPosition().getX()));
+            stmt.setString(5, String.valueOf(this.getPosition().getY()));
+            stmt.setString(6, String.valueOf(this.getdegAtt()));
+            ResultSet id = stmt.executeQuery();
+            int id2 = id.getInt("idCreature");
+            query = "INSERT INTO Humanoide(idCreature,pageEsq,agressif) VALUES ( ? , ? , ? )";
+            stmt = connection.prepareStatement(query);
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1,String.valueOf(id2));
+            stmt.setString(2, String.valueOf(this.getpageEsq()));
+            stmt.setString(3, String.valueOf(true));
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
