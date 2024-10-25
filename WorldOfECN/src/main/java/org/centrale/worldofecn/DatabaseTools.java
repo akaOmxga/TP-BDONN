@@ -171,12 +171,11 @@ public class DatabaseTools {
     /**
      * read database to world
      * @param idJoueur
-     * @param nomPartie
      * @param nomSauvegarde
      * @param monde
      */
     
-    public void readWorld(Integer idJoueur, String nomPartie, String nomSauvegarde, World monde) {
+    public void readWorld(Integer idJoueur, String nomSauvegarde, World monde) {
         if (this.connection == null) {
             throw new IllegalStateException("La connexion à la base de données n'est pas établie");
         }

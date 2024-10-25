@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,11 +27,12 @@ public class World {
     private static final int MAXPEOPLE = 20;
     private static final int MAXMONSTERS = 10;
     private static final int MAXOBJECTS = 20;
+    
+    private int[][] map;
 
     private Integer width;
     private Integer height;
 
-    private List<ElementDeJeu> listElements;
     private Joueur player;
 
     private int nbTour;
@@ -40,6 +42,7 @@ public class World {
      */
     public World() {
         this(20, 20);
+        map = new int [20][20];
     }
 
     /**
@@ -50,8 +53,10 @@ public class World {
      */
     public World(int width, int height) {
         this.setHeightWidth(height, width);
+        map = new int [width][height];
         init();
         generate();
+        
     }
 
     /**
@@ -61,6 +66,24 @@ public class World {
         this.listElements = new LinkedList();
         this.player = new Joueur(this);
     }
+    
+    public void creerMondeAlea(){
+        
+        Random genAlé = new Random();
+        for(ElementDeJeu e :         this.listElements){
+            int x=-1;
+            int y=-1;
+            while (e.getposX()!= x || e.getposY()!=y){
+                x=genAlé.nextInt(width);
+                y=genAlé.nextInt(height);
+                if (map[x][y] == 0){
+                    e.setpos(x,y);
+                    map[x][y] = ind;
+                }
+            }
+        }
+    }
+    
     /**
      * 
      * @return List
@@ -293,5 +316,38 @@ public class World {
     
     public void setPlayer(String name) {
         this.player.getPersonnage().setNom(name);
+    }
+    
+    public void afficheJeu(){ 
+        for (int i = 0;i <  map.length; i++ ) {
+            for (int j = 0; j < map.length; j++) {
+                if (map[j][i] == 0) {
+                    System.out.print("_ ");
+                } else if (map[j][i] == 1){
+                    System.out.print("J ");
+                } else if (map[j][i] >= 100 && map[j][i] < 200){
+                    System.out.print("G ");
+                } else if (map[j][i] >= 200 && map[j][i] < 300){
+                    System.out.print("A ");
+                } else if (map[j][i] >= 300 && map[j][i] < 400){
+                    System.out.print("P ");
+                } else if (map[j][i] >= 400 && map[j][i] < 500){
+                    System.out.print("W ");
+                } else if (map[j][i] >= 500 && map[j][i] < 600){
+                    System.out.print("L ");
+                } else if (map[j][i] >= 1000 && map[j][i] < 1100){
+                    System.out.print("P ");
+                } else if (map[j][i] >= 1100 && map[j][i] < 1200){
+                    System.out.print("S ");
+                } else if (map[j][i] >= 1200 && map[j][i] < 1300){
+                    System.out.print("C ");
+                } else if (map[j][i] >= 1300 && map[j][i] < 1400){
+                    System.out.print("E ");
+                } else if (map[j][i] >= 1400 && map[j][i] < 1500){
+                    System.out.print("N ");
+                }
+            }
+            System.out.println("");
+        }  
     }
 }
