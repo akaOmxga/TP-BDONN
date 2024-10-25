@@ -413,4 +413,12 @@ public class World {
             System.out.println("");
         }  
     }
+    
+    public void setDicoPerso(int index, ElementDeJeu e){
+        dicoPerso.put(index, e);
+    }
+    
+    public void setMap(int x, int y, int index){
+        map[x][y] = index;
+    }
 }

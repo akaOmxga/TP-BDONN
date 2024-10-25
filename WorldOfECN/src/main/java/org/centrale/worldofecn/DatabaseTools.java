@@ -286,19 +286,39 @@ public class DatabaseTools {
             boolean estAgressif = rs.getBoolean("aggressif");
             int nbFleches = rs.getInt("NbFleche");
             if (nbFleches > 0) {                       
-                return new Archer(nom, hp, degAtt, pEsq, pagePar, ptPar, 5, new Point2D(x,y), nbFleches, 0, monde, new ArrayList<>());
+                Archer a = new Archer(nom, hp, degAtt, pEsq, pagePar, ptPar, 5, new Point2D(x,y), nbFleches, 0, monde, new ArrayList<>());
+                int indexA = monde.getIndA();
+                monde.setDicoPerso(indexA, a);
+                monde.setMap(a.getposX(),a.getposY(),indexA);
+                return a;
             } else if (estAgressif) {
-                return new Guerrier(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, 0, 0, 0, 0, monde, new ArrayList<>());
+                Guerrier g = new Guerrier(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, 0, 0, 0, 0, monde, new ArrayList<>());
+                int indexG = monde.getIndG();
+                monde.setDicoPerso(indexG, g);
+                monde.setMap(g.getposX(),g.getposY(),indexG);
+                return g;
             } else {
-                return new Paysan(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, monde, new ArrayList<>());
+                Paysan p = new Paysan(nom, hp, degAtt, pEsq, pagePar, ptPar, 1, new Point2D(x,y), 0, monde, new ArrayList<>());
+                int indexP = monde.getIndP();
+                monde.setDicoPerso(indexP, p);
+                monde.setMap(p.getposX(),p.getposY(),indexP);
+                return p;
             }
         } else {  
             // C'est un monstre
             boolean estAgressif = rs.getBoolean("aggressif");
             if (estAgressif) {
-                return new Loup(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
+                Loup w = new Loup(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
+                int indexW = monde.getIndW();
+                monde.setDicoPerso(indexW, w);
+                monde.setMap(w.getposX(),w.getposY(),indexW);
+                return w;
             } else {
-                return new Lapin(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
+                Lapin l = new Lapin(pEsq, hp, degAtt, pagePar, new Point2D(x,y), monde, new ArrayList<>());
+                int indexL = monde.getIndL();
+                monde.setDicoPerso(indexL, l);
+                monde.setMap(l.getposX(),l.getposY(),indexL);
+                return l;
             }
         }
     }
@@ -319,10 +339,18 @@ public class DatabaseTools {
 
         // Créer l'objet 
         if (nbPvRendus != 0) { // Potion
-            return new PotionSoin(nbPvRendus, place, prix, new Point2D(x,y), monde);
+            PotionSoin Po = new PotionSoin(nbPvRendus, place, prix, new Point2D(x,y), monde);
+            int indexPo = monde.getIndPo();
+            monde.setDicoPerso(indexPo, Po);
+            monde.setMap(Po.getposX(),Po.getposY(),indexPo);
+            return Po;
         } 
         else { // Epee
-            return new Epee(nbMain, degBonus, place, prix, new Point2D(x,y), monde);
+            Epee e = new Epee(nbMain, degBonus, place, prix, new Point2D(x,y), monde);
+            int indexE = monde.getIndE();
+            monde.setDicoPerso(indexE, e);
+            monde.setMap(e.getposX(),e.getposY(),indexE);
+            return e;
         }
     }
 
