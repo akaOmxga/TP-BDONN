@@ -31,7 +31,7 @@ public class World {
     private static final int MAXOBJECTS = 20;
     
     private int[][] map;
-
+    
     private Integer width;
     private Integer height;
     private Random genAlé = new Random();
@@ -101,6 +101,41 @@ public class World {
             }
         }
     }
+    
+    public int getIndG(){
+        indiceGuerrier++;
+        return indiceGuerrier;
+    }
+    
+    public int getIndA(){
+        indiceArcher++;
+        return indiceArcher;
+    }
+    
+    public int getIndP(){
+        indicePaysan++;
+        return indicePaysan;
+    }
+    
+    public int getIndW(){
+        indiceLoup++;
+        return indiceLoup;
+    }
+    
+    public int getIndL(){
+        indiceLapin++;
+        return indiceLapin;
+    } 
+    
+    public int getIndPo(){
+        indicePotion++;
+        return indicePotion;
+    } 
+    
+    public int getIndE(){
+        indiceEpee++;
+        return indiceEpee;
+    } 
     
     /**
      * 
