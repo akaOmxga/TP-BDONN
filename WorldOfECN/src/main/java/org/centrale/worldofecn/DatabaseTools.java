@@ -216,8 +216,8 @@ public class DatabaseTools {
             String creatureQuery = """
                 SELECT c.*, h.*, r.*
                 FROM Creature c
-                LEFT JOIN Humanoide h ON c.idCreature = h.idCreature
-                LEFT JOIN Role r ON h.idHumanoide = r.idHumanode
+                LEFT JOIN Humanode h ON c.idCreature = h.idCreature
+                LEFT JOIN Role r ON h.idHumanode = r.idHumanode
                 WHERE c.idSauvegarde = ?""";
 
             pstmt = connection.prepareStatement(creatureQuery);
@@ -379,7 +379,7 @@ public class DatabaseTools {
             WHERE idRole IN (
                 SELECT r.idRole 
                 FROM Role r
-                JOIN Humanode h ON r.idHumanode = h.idHumanoide
+                JOIN Humanode h ON r.idHumanode = h.idHumanode
                 JOIN Creature c ON h.idCreature = c.idCreature
                 WHERE c.idSauvegarde = ?
             )""";
@@ -391,8 +391,8 @@ public class DatabaseTools {
         // remove Role
         String deleteRoles = """
             DELETE FROM Role 
-            WHERE idHumanoide IN (
-                SELECT h.idHumanoide 
+            WHERE idHumanode IN (
+                SELECT h.idHumanode 
                 FROM Humanode h
                 JOIN Creature c ON h.idCreature = c.idCreature
                 WHERE c.idSauvegarde = ?
@@ -402,15 +402,15 @@ public class DatabaseTools {
         pstmt.executeUpdate();
         pstmt.close();
 
-        // remove Humanoide
-        String deleteHumanoides = """
-            DELETE FROM Humanoide 
+        // remove Humanode
+        String deleteHumanodes = """
+            DELETE FROM Humanode 
             WHERE idCreature IN (
                 SELECT idCreature 
                 FROM Creature 
                 WHERE idSauvegarde = ?
             )""";
-        pstmt = connection.prepareStatement(deleteHumanoides);
+        pstmt = connection.prepareStatement(deleteHumanodes);
         pstmt.setInt(1, idSauvegarde);
         pstmt.executeUpdate();
         pstmt.close();
