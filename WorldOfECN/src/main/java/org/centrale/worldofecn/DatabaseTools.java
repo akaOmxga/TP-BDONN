@@ -266,7 +266,8 @@ public class DatabaseTools {
             } catch (SQLException ex) {
                  System.out.println("Erreur" + ex);
             }
-        }          
+        }
+        monde.afficheJeu(); 
     }
 
     // Méthode utilitaire pour créer une créature à partir d'un ResultSet

@@ -31,7 +31,7 @@ public class World {
     private static final int MAXOBJECTS = 20;
     
     private int[][] map;
-
+    
     private Integer width;
     private Integer height;
     private Random genAlé = new Random();
@@ -73,6 +73,7 @@ public class World {
         map = new int [width][height];
         init();
         generate();
+        creerMondeAlea();
         
     }
 
@@ -84,7 +85,7 @@ public class World {
         this.player = new Joueur(this);
     }
     
-    public void creerMondeAlea(){
+    public final void creerMondeAlea(){
         
         Random genAlé = new Random();
         Set<Integer> list = dicoPerso.keySet();
@@ -101,6 +102,41 @@ public class World {
             }
         }
     }
+    
+    public int getIndG(){
+        indiceGuerrier++;
+        return indiceGuerrier;
+    }
+    
+    public int getIndA(){
+        indiceArcher++;
+        return indiceArcher;
+    }
+    
+    public int getIndP(){
+        indicePaysan++;
+        return indicePaysan;
+    }
+    
+    public int getIndW(){
+        indiceLoup++;
+        return indiceLoup;
+    }
+    
+    public int getIndL(){
+        indiceLapin++;
+        return indiceLapin;
+    } 
+    
+    public int getIndPo(){
+        indicePotion++;
+        return indicePotion;
+    } 
+    
+    public int getIndE(){
+        indiceEpee++;
+        return indiceEpee;
+    } 
     
     /**
      * 
@@ -189,21 +225,24 @@ public class World {
             Creature item = null;
             while (item == null) {
                 switch (itemType) {
-                    case 0: // Guerrier
-                        int indiceGuerrier = 100 + i;
-                        item = new Guerrier("guerrier",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<Utilisable>());
+                    case 0 -> {
+                        // Guerrier
+                        indiceGuerrier = 100 + i;
+                        item = new Guerrier("guerrier",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<>());
                         dicoPerso.put(indiceGuerrier,item);
-                        break;
-                    case 1: // Archer
-                        int indiceArcher = 200 + i;
-                        item = new Archer("archer",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<Utilisable>());
+                    }
+                    case 1 -> {
+                        // Archer
+                        indiceArcher = 200 + i;
+                        item = new Archer("archer",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<>());
                         dicoPerso.put(indiceArcher,item);
-                        break;
-                    case 2: // Paysan
-                        int indicePaysan = 300 + i;
+                    }
+                    case 2 -> {
+                        // Paysan
+                        indicePaysan = 300 + i;
                         item = new Paysan(this);
                         dicoPerso.put(indicePaysan,item);
-                        break;
+                    }
                 }
                 item = (Personnage) check(item);
             }
@@ -224,16 +263,18 @@ public class World {
             Monstre item = null;
             while (item == null) {
                 switch (itemType) {
-                    case 0: // Lapin
+                    case 0 -> {
+                        // Lapin
                         indiceLapin = 500+i;
                         item = new Lapin(this);
                         dicoPerso.put(indiceLapin, item);
-                        break;
-                    case 1: // Loup
+                    }
+                    case 1 -> {
+                        // Loup
                         indiceLoup = 400 + i;
                         item = new Loup(this);
                         dicoPerso.put(indiceLoup,item);
-                        break;
+                    }
                 }
                 item = (Monstre) check(item);
             }
@@ -254,16 +295,18 @@ public class World {
             Objet item = null;
             while (item == null) {
                 switch (itemType) {
-                    case 0: // Potion de soin
-                        int indicePotion = 1000 + i;
+                    case 0 -> {
+                        // Potion de soin
+                        indicePotion = 1000 + i;
                         item = new PotionSoin(genAlé.nextInt(20)+20,this);
                         dicoPerso.put(indicePotion,item);
-                        break;
-                    case 1: // Arme
-                        int indiceEpee = 1100 + i;
+                    }
+                    case 1 -> {
+                        // Arme
+                        indiceEpee = 1100 + i;
                         item = new Epee(genAlé.nextInt(20)+20,this);
-                        dicoPerso.put(indiceEpee,item); 
-                        break;
+                        dicoPerso.put(indiceEpee,item);
+                    }
                 }
                 item = (Objet) check(item);
             }
@@ -294,18 +337,21 @@ public class World {
         int nbF = genAlé.nextInt(21)+20;
         while (item == null) {
             switch (itemType) {
-                case 0: // Guerrier
-                    item = new Guerrier("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<Utilisable>());
+                case 0 -> {
+                    // Guerrier
+                    item = new Guerrier("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<>());
                     dicoPerso.put(indiceJ,item);
-                    break;
-                case 1: // Archer
-                    item = new Archer("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<Utilisable>());
+                }
+                case 1 -> {
+                    // Archer
+                    item = new Archer("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<>());
                     dicoPerso.put(indiceJ,item);
-                    break;
-                case 2: // Paysan
+                }
+                case 2 -> {
+                    // Paysan
                     item = new Paysan(this);
                     dicoPerso.put(indiceJ,item);
-                    break;
+                }
             }
             item = (Personnage) check(item);
         }
