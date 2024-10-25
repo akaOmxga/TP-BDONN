@@ -105,7 +105,7 @@ public class DatabaseTools {
                 stmt.setString(1,nomJoueur);
                 stmt.setString(2,password);
                 ResultSet rs = stmt.executeQuery();
-                boolean exist = rs.next();
+                rs.next();
                 return rs.getInt("IDJoueur");
             } catch (SQLException ex) {
                 Logger.getLogger(DatabaseTools.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,12 +114,15 @@ public class DatabaseTools {
             return null;
     }
 
+    public void saveJustWorld(int playerId,World world){
+        world.saveToDatabase(connection, playerId);
+    }
     /**
      * save world to database
      * @param idJoueur
      * @param idMonde
      * @param nomSauvegarde
-     * @param monde
+     * @param mondee
      */
 
     public void saveWorld(Integer idJoueur, String nomSauvegarde,int idMonde, World mondee) {
@@ -127,7 +130,9 @@ public class DatabaseTools {
             if (nomSauvegarde == null){
                 try {
                     //mondee.saveToDatabase(connection, idMonde, idJoueur);
-                    String query = "UPDATE Sauvegarde SET nbTour = ? WHERE nom = NULL AND idMonde = ? AND Monde.idJoueur = ? INNER JOIN Monde ON Sauvegarde.idMonde = Monde.idMonde RETURNING idSauvegarde";
+                    String query = "UPDATE Sauvegarde SET nbTour = ? "
+                            + "From Monde WHERE Sauvegarde.nom IS NULL AND Sauvegarde.idMonde = ? AND Monde.idJoueur = ? "
+                            + "RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
                     stmt.setInt(1, mondee.getNBTour());
                     stmt.setInt(2, idMonde);
@@ -144,7 +149,7 @@ public class DatabaseTools {
             }
             else {
                 try {
-                    //mondee.saveToDatabase(connection, idMonde, idJoueur);
+                    //mondee.saveToDatabase(connection, idJoueur);
                     String query = "INSERT INTO Sauvegarde (idMonde,nbtour,nom) VALUES ( ?, ?, ? ) RETURNING idSauvegarde";
                     PreparedStatement stmt = connection.prepareStatement(query);
                     stmt.setInt(1, idMonde);

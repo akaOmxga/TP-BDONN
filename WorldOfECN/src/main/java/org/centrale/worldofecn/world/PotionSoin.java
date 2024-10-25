@@ -98,7 +98,7 @@ public class PotionSoin extends Nourriture {
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
         try {
-            String query = "INSERT INTO Objet VALUES ( ? , ? , ? , ? , ? ) RETURNING idCreature";
+            String query = "INSERT INTO Objet (idsauvegarde,place,prix,x,y) VALUES ( ? , ? , ? , ? , ? ) RETURNING idobjet";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,idSauvegarde);
@@ -108,8 +108,8 @@ public class PotionSoin extends Nourriture {
             stmt.setInt(5, this.getPosition().getY());
             ResultSet id = stmt.executeQuery();
             id.next();
-            int id2 = id.getInt("idCreature");
-            query = "INSERT INTO Categorie(idObjet,nbPvRendu) VALUES ( ? , ? )";
+            int id2 = id.getInt("idobjet");
+            query = "INSERT INTO Categorie(idObjet,nbPvRendus) VALUES ( ? , ? )";
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,id2);
             stmt.setInt(2, nbPVRendu);

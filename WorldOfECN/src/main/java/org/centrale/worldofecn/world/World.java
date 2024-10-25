@@ -259,19 +259,29 @@ public class World {
      * Get world from database
      *
      * @param connection
-     * @param idmonde
      * @param idJoueur
      */
-    public void saveToDatabase(Connection connection,int idmonde , int  idJoueur) {
+    public void saveToDatabase(Connection connection , int  idJoueur) {
         if (connection != null) {
             try {
-                String query = "INSERT INTO Monde (idMonde,idJoueur,largeur,hauteur) VALUES (?, ?, ?, ? )";
+                String query = "INSERT INTO Monde (idJoueur,largeur,hauteur) VALUES ( ?, ?, ? ) returning idMonde";
                 PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setInt(1, idmonde);
-                stmt.setInt(2, idJoueur);
-                stmt.setInt(3, this.width);
-                stmt.setInt(4, this.height);
-                stmt.executeUpdate();
+                stmt.setInt(1, idJoueur);
+                stmt.setInt(2, this.width);
+                stmt.setInt(3, this.height);
+                ResultSet id = stmt.executeQuery();
+                id.next();
+                int id2 = id.getInt("idMonde");
+                query = "INSERT INTO Sauvegarde (idMonde,nbtour) VALUES ( ?, ?) RETURNING idSauvegarde";
+                stmt = connection.prepareStatement(query);
+                stmt.setInt(1, id2);
+                stmt.setInt(2, nbTour);
+                id = stmt.executeQuery() ;
+                id.next();
+                id2 = id.getInt("idSauvegarde");
+                for (ElementDeJeu e: getlistElements()){
+                    e.saveToDatabase(connection,id2);
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(World.class.getName()).log(Level.SEVERE, null, ex);
             }

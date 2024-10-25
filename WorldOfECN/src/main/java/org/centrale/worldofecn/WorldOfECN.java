@@ -30,6 +30,7 @@ public class WorldOfECN {
         // Save world
         database.connect();
         Integer playerId = database.getPlayerID("test", "aze");
+        database.saveJustWorld(playerId,world);
         database.saveWorld(playerId,"Start", 1 , world);
         
         // Retreive World
