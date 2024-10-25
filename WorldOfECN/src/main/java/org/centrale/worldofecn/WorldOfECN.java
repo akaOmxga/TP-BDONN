@@ -8,6 +8,7 @@
 
 package org.centrale.worldofecn;
 
+import java.sql.SQLException;
 import org.centrale.worldofecn.world.World;
 
 /**
@@ -20,7 +21,7 @@ public class WorldOfECN {
      * main program
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         World world = new World();
         world.setPlayer("Saegusa");
         
@@ -30,11 +31,17 @@ public class WorldOfECN {
         // Save world
         database.connect();
         Integer playerId = database.getPlayerID("test", "aze");
-        database.saveJustWorld(playerId,world);
-        database.saveWorld(playerId,"Start", 5 , world);
+       // database.saveJustWorld(playerId,world);
+        // database.saveWorld(playerId,"Start", 5 , world);
         
         // Retreive World
-//        database.readWorld(playerId, "Start", world);
-//        database.disconnect();
+        database.readWorld(playerId, "Start", world);
+        
+        
+        // Delete World 
+        //database.removeWorld(playerId, "Start");
+        
+        // The End
+        database.disconnect();
     }
 }
