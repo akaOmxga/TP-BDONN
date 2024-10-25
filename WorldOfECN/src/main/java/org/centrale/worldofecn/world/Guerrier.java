@@ -114,7 +114,7 @@ public class Guerrier extends Personnage implements Combattant {
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
         try {
-            String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+            String query = "INSERT INTO Creature (idsauvegarde,hp,pageatt,x,y,degatt) VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,idSauvegarde);
@@ -126,14 +126,21 @@ public class Guerrier extends Personnage implements Combattant {
             ResultSet id = stmt.executeQuery();
             id.next();
             int id2 = id.getInt("idCreature");
-            query = "INSERT INTO Humanoide(idCreature,ptPar,agressif,pagePar,nom) VALUES ( ? , ? , ? , ? , ? )";
+            query = "INSERT INTO Humanoide(idCreature,ptPar,pagePar,nom) VALUES ( ? , ? , ? , ?) RETURNING idhumanoide";
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,id2);
             stmt.setInt(2, this.getptPar());
-            stmt.setBoolean(3, true);
-            stmt.setInt(4, this.getpagePar());
-            stmt.setString(5, this.getNom());
+            stmt.setInt(3, this.getpagePar());
+            stmt.setString(4, this.getNom());
+            id = stmt.executeQuery();
+            id.next();
+            id2 = id.getInt("idhumanoide");
+            query = "INSERT INTO role(idhumanoide,aggressif) VALUES ( ? , ? )";
+            stmt = connection.prepareStatement(query);
+            stmt.setInt(1,id2);
+            stmt.setBoolean(2, true);
             stmt.executeUpdate();
+
             if(arme!=null){
                     arme.saveToDatabase(connection, idSauvegarde);
             }

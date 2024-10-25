@@ -96,7 +96,7 @@ public class Loup extends Monstre implements Combattant{
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
         try {
-            String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+            String query = "INSERT INTO Creature (idsauvegarde,hp,pageatt,x,y,degatt) VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,idSauvegarde);
@@ -108,11 +108,17 @@ public class Loup extends Monstre implements Combattant{
             ResultSet id = stmt.executeQuery();
             id.next();
             int id2 = id.getInt("idCreature");
-            query = "INSERT INTO Humanoide(idCreature,pageEsq,agressif) VALUES ( ? , ? , ? )";
+            query = "INSERT INTO Humanoide(idCreature,pageEsq) VALUES ( ? , ? ) returning idhumanoide";
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,id2);
             stmt.setInt(2, this.getpageEsq());
-            stmt.setBoolean(3, true);
+            id = stmt.executeQuery();
+            id.next();
+            id2 = id.getInt("idhumanoide");
+            query = "INSERT INTO role(idhumanoide,aggressif) VALUES ( ? , ? )";
+            stmt = connection.prepareStatement(query);
+            stmt.setInt(1,id2);
+            stmt.setBoolean(2, true);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);

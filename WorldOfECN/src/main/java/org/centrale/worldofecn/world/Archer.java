@@ -102,7 +102,7 @@ public class Archer extends Personnage {
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
         try {
-            String query = "INSERT INTO Creature VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
+            String query = "INSERT INTO Creature (idsauvegarde,hp,pageatt,x,y,degatt) VALUES ( ?, ? , ? , ? , ? , ? ) RETURNING idCreature";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,idSauvegarde);
@@ -114,16 +114,22 @@ public class Archer extends Personnage {
             ResultSet id = stmt.executeQuery();
             id.next();
             int id2 = id.getInt("idCreature");
-            query = "INSERT INTO Humanoide(idCreature,ptPar,NbFleche,agressif,pagePar,nom) VALUES ( ? , ? , ? , ? , ? , ? )";
-            stmt = connection.prepareStatement(query);
+            query = "INSERT INTO Humanoide(idCreature,ptPar,pagePar,nom) VALUES ( ? , ? , ? , ? ) RETURNING idhumanoide";
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,id2);
             stmt.setInt(2, this.getptPar());
+            stmt.setInt(3, this.getpagePar());
+            stmt.setString(4, this.getNom());
+            id = stmt.executeQuery();
+            id.next();
+            id2 = id.getInt("idhumanoide");
+            query = "INSERT INTO role(idhumanoide,aggressif,nbfleche) VALUES ( ? , ? , ?)";
+            stmt = connection.prepareStatement(query);
+            stmt.setInt(1,id2);
+            stmt.setBoolean(2, true);
             stmt.setInt(3, nbFleches);
-            stmt.setBoolean(4, true);
-            stmt.setInt(5, this.getpagePar());
-            stmt.setString(6, this.getNom());
             stmt.executeUpdate();
+            
         } catch (SQLException ex) {
             Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
         } 

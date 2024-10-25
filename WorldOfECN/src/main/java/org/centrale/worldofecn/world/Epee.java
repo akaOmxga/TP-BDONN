@@ -111,7 +111,7 @@ public class Epee extends Objet {
     @Override
     public void saveToDatabase(Connection connection,Integer idSauvegarde) {
         try {
-            String query = "INSERT INTO Objet VALUES ( ? , ? , ? , ? , ? ) RETURNING idCreature";
+            String query = "INSERT INTO Objet (idsauvegarde,place,prix,x,y) VALUES ( ? , ? , ? , ? , ? ) RETURNING idobjet";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,idSauvegarde);
@@ -121,12 +121,12 @@ public class Epee extends Objet {
             stmt.setInt(5, this.getPosition().getY());
             ResultSet id = stmt.executeQuery();
             id.next();
-            int id2 = id.getInt("idCreature");
+            int id2 = id.getInt("idobjet");
             query = "INSERT INTO Categorie(idObjet,degBonus,nbMain) VALUES ( ? , ? , ?)";
             stmt = connection.prepareStatement(query);
             stmt.setInt(1,id2);
             stmt.setInt(2, this.degAtt);
-            stmt.setInt(2, this.nbMain);
+            stmt.setInt(3, this.nbMain);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(Creature.class.getName()).log(Level.SEVERE, null, ex);
