@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -29,9 +31,23 @@ public class World {
 
     private Integer width;
     private Integer height;
-
+    private Random genAlé = new Random();
     private List<ElementDeJeu> listElements;
+    private HashMap<Integer, ElementDeJeu> dicoPerso = new HashMap<>();
     private Joueur player;
+    
+    // identifiant 
+    // configuration des id : 
+    private int indiceGuerrier = 100; 
+    private int indiceArcher = 200;
+    private int indicePaysan = 300;
+    private int indiceLoup = 400;
+    private int indiceLapin = 500;
+    private int indiceEpee = 1100;
+    private int indicePotion = 1000;
+    private int indiceChampi = 1200;
+    private int indiceEpinard = 1300;
+    private int indiceNuage = 1400;
 
     private int nbTour;
 
@@ -130,19 +146,38 @@ public class World {
      */
     private void generatePersonnages(int nbElements) {
         Random rand = new Random();
+        int ptVie = genAlé.nextInt(21)+190;
+        int DA = genAlé.nextInt(11)+55;
+        int ptPar = genAlé.nextInt(11)+30;
+        int paAtt = genAlé.nextInt(11)+90;
+        int paPar = genAlé.nextInt(11)+45;
+        int dMax = 1;
+        Point2D pos = new Point2D(0,0);
+        int argent = genAlé.nextInt(501);
+        int nbMain = 0;
+        int degEpee = 0;
+        int prix = 0;
+        int place = 0;
+        int nbF = genAlé.nextInt(21)+20;
         for (int i = 0; i < nbElements; i++) {
             int itemType = rand.nextInt(3);
             Creature item = null;
             while (item == null) {
                 switch (itemType) {
                     case 0: // Guerrier
-                        item = new Guerrier(this);
+                        int indiceGuerrier = 100 + i;
+                        item = new Guerrier("guerrier",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<Utilisable>());
+                        dicoPerso.put(indiceGuerrier,item);
                         break;
                     case 1: // Archer
-                        item = new Archer(this);
+                        int indiceArcher = 200 + i;
+                        item = new Archer("archer",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<Utilisable>());
+                        dicoPerso.put(indiceArcher,item);
                         break;
                     case 2: // Paysan
+                        int indicePaysan = 300 + i;
                         item = new Paysan(this);
+                        dicoPerso.put(indicePaysan,item);
                         break;
                 }
                 item = (Personnage) check(item);
@@ -165,10 +200,14 @@ public class World {
             while (item == null) {
                 switch (itemType) {
                     case 0: // Lapin
+                        indiceLapin = 500+i;
                         item = new Lapin(this);
+                        dicoPerso.put(indiceLapin, item);
                         break;
                     case 1: // Loup
+                        indiceLoup = 400 + i;
                         item = new Loup(this);
+                        dicoPerso.put(indiceLoup,item);
                         break;
                 }
                 item = (Monstre) check(item);
@@ -191,10 +230,14 @@ public class World {
             while (item == null) {
                 switch (itemType) {
                     case 0: // Potion de soin
-                        item = new PotionSoin(this);
+                        int indicePotion = 1000 + i;
+                        item = new PotionSoin(genAlé.nextInt(20)+20,this);
+                        dicoPerso.put(indicePotion,item);
                         break;
                     case 1: // Arme
-                        item = new Epee(this);
+                        int indiceEpee = 1100 + i;
+                        item = new Epee(genAlé.nextInt(20)+20,this);
+                        dicoPerso.put(indiceEpee,item); 
                         break;
                 }
                 item = (Objet) check(item);
@@ -209,16 +252,34 @@ public class World {
      */
     private void generatePlayer(int itemType) {
         Personnage item = null;
+        int indiceJ = 1;
+        Random rand = new Random();
+        int ptVie = genAlé.nextInt(21)+190;
+        int DA = genAlé.nextInt(11)+55;
+        int ptPar = genAlé.nextInt(11)+30;
+        int paAtt = genAlé.nextInt(11)+90;
+        int paPar = genAlé.nextInt(11)+45;
+        int dMax = 1;
+        Point2D pos = new Point2D(0,0);
+        int argent = genAlé.nextInt(501);
+        int nbMain = 0;
+        int degEpee = 0;
+        int prix = 0;
+        int place = 0;
+        int nbF = genAlé.nextInt(21)+20;
         while (item == null) {
             switch (itemType) {
                 case 0: // Guerrier
-                    item = new Guerrier(this);
+                    item = new Guerrier("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,place,nbMain,degEpee,prix,argent,this, new ArrayList<Utilisable>());
+                    dicoPerso.put(indiceJ,item);
                     break;
                 case 1: // Archer
-                    item = new Archer(this);
+                    item = new Archer("Joueur",ptVie,DA,ptPar,paAtt,paPar,dMax,pos,nbF,argent,this,new ArrayList<Utilisable>());
+                    dicoPerso.put(indiceJ,item);
                     break;
                 case 2: // Paysan
                     item = new Paysan(this);
+                    dicoPerso.put(indiceJ,item);
                     break;
             }
             item = (Personnage) check(item);
@@ -294,4 +355,5 @@ public class World {
     public void setPlayer(String name) {
         this.player.getPersonnage().setNom(name);
     }
+    
 }

@@ -171,12 +171,11 @@ public class DatabaseTools {
     /**
      * read database to world
      * @param idJoueur
-     * @param nomPartie
      * @param nomSauvegarde
      * @param monde
      */
     
-    public void readWorld(Integer idJoueur, String nomPartie, String nomSauvegarde, World monde) {
+    public void readWorld(Integer idJoueur, String nomSauvegarde, World monde) {
         if (this.connection == null) {
             throw new IllegalStateException("La connexion à la base de données n'est pas établie");
         }
@@ -221,8 +220,8 @@ public class DatabaseTools {
             String creatureQuery = """
                 SELECT c.*, h.*, r.*
                 FROM Creature c
-                LEFT JOIN Humanode h ON c.idCreature = h.idCreature
-                LEFT JOIN Role r ON h.idHumanode = r.idHumanode
+                LEFT JOIN Humanoide h ON c.idCreature = h.idCreature
+                LEFT JOIN Role r ON h.idHumanoide = r.idHumanoide
                 WHERE c.idSauvegarde = ?""";
 
             pstmt = connection.prepareStatement(creatureQuery);
@@ -330,13 +329,12 @@ public class DatabaseTools {
     /**
      * remove world from database
      * @param idJoueur
-     * @param nomPartie
      * @param nomSauvegarde
      * @throws SQLException 
      */
     
-    public void removeWorld(int idJoueur, String nomPartie, String nomSauvegarde) throws SQLException {
-    if (nomPartie == null || nomSauvegarde == null) {
+    public void removeWorld(int idJoueur, String nomSauvegarde) throws SQLException {
+    if (nomSauvegarde == null) {
         throw new IllegalArgumentException("Le nom de la partie et le nom de la sauvegarde ne peuvent pas être null");
     }
 
@@ -384,7 +382,7 @@ public class DatabaseTools {
             WHERE idRole IN (
                 SELECT r.idRole 
                 FROM Role r
-                JOIN Humanode h ON r.idHumanode = h.idHumanode
+                JOIN Humanoide h ON r.idHumanoide = h.idHumanoide
                 JOIN Creature c ON h.idCreature = c.idCreature
                 WHERE c.idSauvegarde = ?
             )""";
@@ -396,9 +394,9 @@ public class DatabaseTools {
         // remove Role
         String deleteRoles = """
             DELETE FROM Role 
-            WHERE idHumanode IN (
-                SELECT h.idHumanode 
-                FROM Humanode h
+            WHERE idHumanoide IN (
+                SELECT h.idHumanoide 
+                FROM Humanoide h
                 JOIN Creature c ON h.idCreature = c.idCreature
                 WHERE c.idSauvegarde = ?
             )""";
@@ -407,15 +405,15 @@ public class DatabaseTools {
         pstmt.executeUpdate();
         pstmt.close();
 
-        // remove Humanode
-        String deleteHumanodes = """
-            DELETE FROM Humanode 
+        // remove Humanoide
+        String deleteHumanoides = """
+            DELETE FROM Humanoide 
             WHERE idCreature IN (
                 SELECT idCreature 
                 FROM Creature 
                 WHERE idSauvegarde = ?
             )""";
-        pstmt = connection.prepareStatement(deleteHumanodes);
+        pstmt = connection.prepareStatement(deleteHumanoides);
         pstmt.setInt(1, idSauvegarde);
         pstmt.executeUpdate();
         pstmt.close();
